@@ -29,6 +29,21 @@ set(VSCP_BUILD_TESTS OFF CACHE BOOL "Build VSCP library tests" FORCE)
 set(VSCP_INSTALL OFF CACHE BOOL "Install VSCP helper libraries" FORCE)
 add_subdirectory(third-party/vscp)
 
+if(NOT TARGET vscp_sqlite3)
+    add_library(vscp_sqlite3 STATIC
+        third-party/vscp/third-party/sqlite3/sqlite3.c)
+    target_include_directories(vscp_sqlite3
+        PUBLIC
+            third-party/vscp/third-party/sqlite3)
+endif()
+
+target_include_directories(vscp_mdf
+    PUBLIC
+        third-party/json/include
+        third-party/Mustache
+        third-party/spdlog/include
+        third-party/vscp/third_party/maddy/include)
+
 set(VSCPD_SOURCES
     src/controlobject.cpp
     src/devicelist.cpp
@@ -43,7 +58,9 @@ add_executable(mqtt-vscpd ${VSCPD_SOURCES})
 
 target_include_directories(mqtt-vscpd
     PRIVATE
-        src)
+        src
+        third-party/json/include
+        third-party/vscp/third-party/sqlite3)
 
 target_link_libraries(mqtt-vscpd
     PRIVATE
