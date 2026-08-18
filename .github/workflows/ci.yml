@@ -119,3 +119,73 @@ jobs:
             build/*.tgz
             build/*.zip
             build/*.exe
+
+  raspberry-pi:
+    name: Raspberry Pi ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ARM64
+            platform: linux/arm64
+            image: arm64v8/ubuntu:24.04
+          - name: ARMHF
+            platform: linux/arm/v7
+            image: arm32v7/ubuntu:24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Enable ARM emulation
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64,arm
+
+      - name: Build and package
+        run: >-
+          docker run --rm
+          --platform ${{ matrix.platform }}
+          -e VSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
+          -v "${{ github.workspace }}:/workspace"
+          -w /workspace
+          ${{ matrix.image }}
+          bash -euxo pipefail -c '
+            export DEBIAN_FRONTEND=noninteractive;
+            apt-get update;
+            apt-get install -y
+              build-essential
+              cmake
+              curl
+              file
+              libcurl4-openssl-dev
+              libexpat1-dev
+              libmosquitto-dev
+              libssl-dev
+              libsystemd-dev
+              pandoc
+              pkg-config
+              rpm;
+            cmake -S . -B build
+              -DCMAKE_BUILD_TYPE=Release
+              -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
+              "-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP";
+            cmake --build build --parallel;
+            cpack --config build/CPackConfig.cmake -C Release;
+            file mqtt-vscpd* || true
+          '
+
+      - name: Upload Raspberry Pi artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: vscpd-raspberry-pi-${{ matrix.name }}
+          if-no-files-found: error
+          path: |
+            *.deb
+            *.rpm
+            *.tar.gz
+            *.tgz
+            *.zip
