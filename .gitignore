@@ -46,3 +46,7 @@ build/
 *.tgz
 *.tar.gz
 *.deb
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

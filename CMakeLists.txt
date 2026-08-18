@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.20...3.31)
 
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/version.h" VSCPD_VERSION_MAJOR REGEX "^#define VSCPD_VERSION_MAJOR[ \\t]+([0-9]+)$")
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/version.h" VSCPD_VERSION_MINOR REGEX "^#define VSCPD_VERSION_MINOR[ \\t]+([0-9]+)$")
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/version.h" VSCPD_VERSION_PATCH REGEX "^#define VSCPD_VERSION_PATCH[ \\t]+([0-9]+)$")
+string(REGEX REPLACE "^#define VSCPD_VERSION_(MAJOR|MINOR|PATCH)[ \\t]+" "" VSCPD_VERSION_MAJOR "${VSCPD_VERSION_MAJOR}")
+string(REGEX REPLACE "^#define VSCPD_VERSION_(MAJOR|MINOR|PATCH)[ \\t]+" "" VSCPD_VERSION_MINOR "${VSCPD_VERSION_MINOR}")
+string(REGEX REPLACE "^#define VSCPD_VERSION_(MAJOR|MINOR|PATCH)[ \\t]+" "" VSCPD_VERSION_PATCH "${VSCPD_VERSION_PATCH}")
+
 project(vscpd
-    VERSION 15.0.3
+    VERSION ${VSCPD_VERSION_MAJOR}.${VSCPD_VERSION_MINOR}.${VSCPD_VERSION_PATCH}
     DESCRIPTION "VSCP daemon"
     LANGUAGES C CXX)
 
@@ -32,13 +39,13 @@ if(WIN32)
     list(APPEND VSCPD_SOURCES src/pch.cpp)
 endif()
 
-add_executable(vscpd ${VSCPD_SOURCES})
+add_executable(mqtt-vscpd ${VSCPD_SOURCES})
 
-target_include_directories(vscpd
+target_include_directories(mqtt-vscpd
     PRIVATE
         src)
 
-target_link_libraries(vscpd
+target_link_libraries(mqtt-vscpd
     PRIVATE
         vscp_common
         vscp_sqlite3)
@@ -46,16 +53,16 @@ target_link_libraries(vscpd
 if(WIN32)
     find_package(pthread REQUIRED)
     if(TARGET PThreads4W::PThreads4W_CXXEXC)
-        target_link_libraries(vscpd PRIVATE PThreads4W::PThreads4W_CXXEXC)
+        target_link_libraries(mqtt-vscpd PRIVATE PThreads4W::PThreads4W_CXXEXC)
     endif()
 
-    target_link_libraries(vscpd PRIVATE netapi32)
+    target_link_libraries(mqtt-vscpd PRIVATE netapi32)
 
     if(MSVC)
-        target_compile_options(vscpd PRIVATE /utf-8)
+        target_compile_options(mqtt-vscpd PRIVATE /utf-8)
     endif()
 
-    target_compile_definitions(vscpd
+    target_compile_definitions(mqtt-vscpd
         PRIVATE
             _CRT_SECURE_NO_WARNINGS
             _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -69,8 +76,8 @@ if(UNIX AND NOT APPLE)
         message(FATAL_ERROR "libsystemd headers and library are required to build vscpd on Linux.")
     endif()
 
-    target_include_directories(vscpd PRIVATE ${SYSTEMD_INCLUDE_DIR})
-    target_link_libraries(vscpd PRIVATE ${SYSTEMD_LIBRARY})
+    target_include_directories(mqtt-vscpd PRIVATE ${SYSTEMD_INCLUDE_DIR})
+    target_link_libraries(mqtt-vscpd PRIVATE ${SYSTEMD_LIBRARY})
 endif()
 
 if(VSCPD_BUILD_MANPAGES AND UNIX)
@@ -105,7 +112,7 @@ if(NOT WIN32)
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
-install(TARGETS vscpd
+install(TARGETS mqtt-vscpd
     RUNTIME DESTINATION ${VSCPD_RUNTIME_DESTINATION})
 
 install(FILES
@@ -186,9 +193,9 @@ elseif(WIN32)
         set(CPACK_GENERATOR "ZIP")
     endif()
 elseif(APPLE)
-    set(CPACK_GENERATOR "TGZ")
+    set(CPACK_GENERATOR "TGZ;ZIP")
 else()
-    set(CPACK_GENERATOR "TGZ;DEB")
+    set(CPACK_GENERATOR "TGZ;DEB;RPM;ZIP")
 endif()
 
 if(WIN32)
@@ -196,7 +203,7 @@ if(WIN32)
     set(CPACK_NSIS_PACKAGE_NAME "VSCP Daemon")
     set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
     set(CPACK_NSIS_MODIFY_PATH OFF)
-    set(CPACK_PACKAGE_EXECUTABLES "vscpd;VSCP Daemon")
+    set(CPACK_PACKAGE_EXECUTABLES "mqtt-vscpd;VSCP Daemon")
 endif()
 
 if(UNIX AND NOT APPLE)

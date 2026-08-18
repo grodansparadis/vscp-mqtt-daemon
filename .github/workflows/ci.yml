@@ -25,7 +25,7 @@ jobs:
               cmake -S . -B build
               -DCMAKE_BUILD_TYPE=Release
               -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
-              -DVSCPD_PACKAGE_GENERATORS=TGZ\;DEB
+              -DVSCPD_PACKAGE_GENERATORS=TGZ\;DEB\;RPM\;ZIP
           - name: macOS
             os: macos-latest
             configure: >-
@@ -33,7 +33,7 @@ jobs:
               -DCMAKE_BUILD_TYPE=Release
               -DCMAKE_PREFIX_PATH=${BREW_PREFIXES}
               -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
-              -DVSCPD_PACKAGE_GENERATORS=TGZ
+              -DVSCPD_PACKAGE_GENERATORS=TGZ\;ZIP
           - name: Windows
             os: windows-latest
             configure: >-
@@ -67,6 +67,7 @@ jobs:
             libsystemd-dev \
             pandoc \
             pkg-config
+            rpm
 
       - name: Install macOS dependencies
         if: runner.os == 'macOS'
@@ -108,6 +109,7 @@ jobs:
           if-no-files-found: error
           path: |
             *.deb
+            *.rpm
             *.tar.gz
             *.tgz
             *.zip

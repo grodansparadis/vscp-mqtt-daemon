@@ -19,7 +19,7 @@
 set -e
 
 PIDFILE=/var/run/vscpd.pid
-DAEMON=/usr/sbin/vscpd
+DAEMON=/usr/sbin/mqtt-vscpd
 
 # /etc/init.d/vscpd: start and stop the vscpd daemon
 

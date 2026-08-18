@@ -373,7 +373,7 @@ Write the following, as root, to
     [Service] 
     Type=forking 
     PIDFile=/var/run/vscpd/vscpd.pid 
-    ExecStart=-/usr/local/bin/vscpd
+    ExecStart=-/usr/local/bin/mqtt-vscpd
     TimeoutStopSec=1
     RuntimeDirectory=vscpd
     [Install]

@@ -5,7 +5,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/sbin/vscpd -c /etc/vscp/vscpd.json
+ExecStart=/usr/sbin/mqtt-vscpd -c /etc/vscp/vscpd.json
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=on-failure
 User=vscp

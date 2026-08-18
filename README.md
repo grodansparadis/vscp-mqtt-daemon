@@ -1,6 +1,12 @@
-# vscp-daemon
+# vscp-mqtt-daemon
 
-The VSCP daemon is the server for the VSCP protocol.
+There are currently two servers (daemons) for the VSCP protocol. The VSCP MQTT daemon (mqtt-vscpd) is a server for the VSCP protocol. The [VSCP tcp/ip daemon (tcpip-vscpd)](https://github.com/grodansparadis/vscp-tcpip-daemon) is the other. 
+
+The **mqtt-vscpd** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers.
+
+The **tcpip-vscpd** daemon export the VSCP tcp/ip link protocol and can just as the mqtt-vscpd connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface.
+
+Thsi repsoitory is for the mqtt-vscpd.  Got the repository for the [tcpip-vscpd](https://github.com/grodansparadis/vscp-tcpip-daemon) for information about the tcpip-vscpd
 
 ## Build
 
