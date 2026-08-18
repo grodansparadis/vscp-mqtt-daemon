@@ -6,7 +6,7 @@ The **mqtt-vscpd** is oriented around the MQTT protocol. It can be used to conne
 
 The **tcpip-vscpd** daemon export the VSCP tcp/ip link protocol and can just as the mqtt-vscpd connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface.
 
-Thsi repsoitory is for the mqtt-vscpd.  Got the repository for the [tcpip-vscpd](https://github.com/grodansparadis/vscp-tcpip-daemon) for information about the tcpip-vscpd
+Thsi repository is for the mqtt-vscpd.  Got the repository for the [tcpip-vscpd](https://github.com/grodansparadis/vscp-tcpip-daemon) for information about the tcpip-vscpd
 
 ## Build
 

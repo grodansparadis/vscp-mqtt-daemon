@@ -358,7 +358,7 @@ main(int argc, char **argv)
     spdlog::set_default_logger(logger);
   }
   catch (...) {
-    console->critical("vscpd: Unable to start the application du to spdlog setup failure. Exiting.");
+    console->critical("vscpd: Unable to start the application due to spdlog setup failure. Exiting.");
     spdlog::drop_all();
     spdlog::shutdown();
     exit(EXIT_FAILURE);
