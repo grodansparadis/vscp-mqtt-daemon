@@ -156,22 +156,22 @@ jobs:
           bash -euxo pipefail -c '
             export DEBIAN_FRONTEND=noninteractive;
             apt-get update;
-            apt-get install -y
-              build-essential
-              cmake
-              curl
-              file
-              libcurl4-openssl-dev
-              libexpat1-dev
-              libmosquitto-dev
-              libssl-dev
-              libsystemd-dev
-              pandoc
-              pkg-config
+            apt-get install -y \
+              build-essential \
+              cmake \
+              curl \
+              file \
+              libcurl4-openssl-dev \
+              libexpat1-dev \
+              libmosquitto-dev \
+              libssl-dev \
+              libsystemd-dev \
+              pandoc \
+              pkg-config \
               rpm;
-            cmake -S . -B build
-              -DCMAKE_BUILD_TYPE=Release
-              -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
+            cmake -S . -B build \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER} \
               "-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP";
             cmake --build build --parallel;
             cpack --config build/CPackConfig.cmake -C Release;
