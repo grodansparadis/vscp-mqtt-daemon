@@ -127,10 +127,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: ARM64
+          - name: arm64
             platform: linux/arm64
             image: arm64v8/ubuntu:24.04
-          - name: ARMHF
+          - name: armhf
             platform: linux/arm/v7
             image: arm32v7/ubuntu:24.04
 

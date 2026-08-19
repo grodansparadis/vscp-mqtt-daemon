@@ -14,7 +14,7 @@ The folders VSCP files are installed to has changed extensively from version 14.
 | /var/lib/vscp | Persistent storage for vscpd and other software and tools related to VSCP. This is the default location for databases also. |
 | /var/lib/vscp/web | The VSCP daemon package creates the web folder structure even it does not use them. This is mainly intended for the [vscpl2drv_webserv driver](https://github.com/grodansparadis/vscpl2drv-websrv) |
 | /run | lock file vscpd.lock |
-| /usr/share/vscp | Shared VSCP date such as config examples etc. | 
+| /usr/share/mqttvscp | Shared VSCP date such as config examples etc. | 
 
     
 [filename](./bottom_copyright.md ':include')

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-pandoc -s -t man vscpd.8.md -o vscpd.8
-sudo cp vscpd.8 /usr/share/man/man8/
+pandoc -s -t man mqttvscpd.8.md -o mqttvscpd.8
+sudo cp mqttvscpd.8 /usr/share/man/man8/
 
-pandoc -s -t man uvscpd.8.md -o uvscpd.8
-sudo cp uvscpd.8 /usr/share/man/man8/
+pandoc -s -t man umqttvscpd.8.md -o umqttvscpd.8
+sudo cp umqttvscpd.8 /usr/share/man/man8/
 
 pandoc -s -t man vscpcmd.1.md -o vscpcmd.1
 sudo cp vscpcmd.1 /usr/share/man/man1/
@@ -12,16 +12,16 @@ sudo cp vscpcmd.1 /usr/share/man/man1/
 pandoc -s -t man vscp-mkpasswd.1.md -o vscp-mkpasswd.1
 sudo cp vscp-mkpasswd.1 /usr/share/man/man1/
 
-pandoc -s -t man vscpdrivers.7.md -o vscpdrivers.7
-sudo cp vscpdrivers.7 /usr/share/man/man7/
+pandoc -s -t man mqttvscpdrivers.7.md -o mqttvscpdrivers.7
+sudo cp mqttvscpdrivers.7 /usr/share/man/man7/
 
-pandoc -s -t man vscpd-tls.7.md -o vscpd-tls.7
-sudo cp vscpd-tls.7 /usr/share/man/man7/
+pandoc -s -t man mqttvscpd-tls.7.md -o mqttvscpd-tls.7
+sudo cp mqttvscpd-tls.7 /usr/share/man/man7/
 
 pandoc -s -t man vscp.7.md -o vscp.7
 sudo cp vscp.7 /usr/share/man/man7/
 
-pandoc -s -t man vscpd.json.5.md -o vscpd.json.5
-sudo cp vscpd.json.5 /usr/share/man/man5/
+pandoc -s -t man mqttvscpd.json.5.md -o mqttvscpd.json.5
+sudo cp mqttvscpd.json.5 /usr/share/man/man5/
 
 mandb

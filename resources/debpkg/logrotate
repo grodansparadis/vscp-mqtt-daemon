@@ -1,4 +1,4 @@
-/var/log/vscp/vscpd-access.log {
+/var/log/vscp/mqttvscpd-access.log {
 	rotate 7
 	daily
 	compress
@@ -6,11 +6,11 @@
 	nocreate
 	missingok
 	postrotate
-		/usr/bin/killall -HUP vscpd
+		/usr/bin/killall -HUP mqttvscpd
 	endscript
 }
 
-/var/log/vscp/vscpd-error.log {
+/var/log/vscp/mqttvscpd-error.log {
 	rotate 7
 	daily
 	compress
@@ -18,6 +18,6 @@
 	nocreate
 	missingok
 	postrotate
-		/usr/bin/killall -HUP vscpd
+		/usr/bin/killall -HUP mqttvscpd
 	endscript
 }

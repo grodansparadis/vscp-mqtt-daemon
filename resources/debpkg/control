@@ -1,4 +1,4 @@
-Source: vscpd
+Source: mqttvscpd
 Section: net
 Priority: optional
 Maintainer: Ake Hedman <akhe@vscp.org>

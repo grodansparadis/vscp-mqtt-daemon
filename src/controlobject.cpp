@@ -282,14 +282,14 @@ CControlObject::CControlObject()
   }
 
   m_strServerName = "VSCP Daemon";
-  m_rootFolder    = "/var/lib/vscp/vscpd/";
+  m_rootFolder    = "/var/lib/vscp/mqttvscpd/";
 
-  m_pathClassTypeDefinitionDb = "/var/lib/vscp/vscpd/vscp_events.sqlite3";
+  m_pathClassTypeDefinitionDb = "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3";
 
   // Logging defaults
   m_fileLogLevel     = spdlog::level::info;
   m_fileLogPattern   = "[vscpd] [%^%l%$] %v";
-  m_path_to_log_file = "/var/log/vscp/vscp.log";
+  m_path_to_log_file = "/var/log/vscp/mqttvscpd.log";
   m_max_log_size     = 5242880;
   m_max_log_files    = 7;
 
@@ -446,11 +446,11 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     }
   }
 
-  str = "VSCP Server started - ";
+  str = "VSCP MQTT Daemon started - ";
   str += "Version: ";
-  str += VSCPD_DISPLAY_VERSION;
+  str += MQTTVSCPD_DISPLAY_VERSION;
   str += " - ";
-  str += VSCPD_COPYRIGHT;
+  str += MQTTVSCPD_COPYRIGHT;
   spdlog::info(str.c_str());
 
   // Load class/type definitions from database if they should be loaded
@@ -682,7 +682,7 @@ CControlObject::init_mqtt()
   m_mqttClient.setUserEscape("server-name", m_strServerName);
   m_mqttClient.setUserEscape("root-folder", m_rootFolder);
   m_mqttClient.setUserEscape("server-user", m_runAsUser);
-  m_mqttClient.setUserEscape("server-version", VSCPD_DISPLAY_VERSION);
+  m_mqttClient.setUserEscape("server-version", MQTTVSCPD_DISPLAY_VERSION);
 
   time_t t = time(NULL);
   char buf[80];
@@ -730,7 +730,7 @@ CControlObject::init_mqtt()
     data.set("srvguid", m_guid.getAsString());
     data.set("ifguid", m_guid.getAsString());
     std::string strTopic   = subtemplate.render(data);
-    std::string strPayload = VSCPD_DISPLAY_VERSION;
+    std::string strPayload = MQTTVSCPD_DISPLAY_VERSION;
     if (MOSQ_ERR_SUCCESS != (rv = mosquitto_publish(m_mqttClient.getMqttHandle(),
                                                     NULL,
                                                     strTopic.c_str(),

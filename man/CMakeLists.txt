@@ -24,16 +24,16 @@ endif()
 # man pages
 if (${PANDOCCOMMAND_FOUND})
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vscpd.8
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vscpd.8.md
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mqttvscpd.8.md
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND pandoc -s -t man ${CMAKE_CURRENT_SOURCE_DIR}/vscpd.8.md -o ${CMAKE_CURRENT_BINARY_DIR}/vscpd.8
+    COMMAND pandoc -s -t man ${CMAKE_CURRENT_SOURCE_DIR}/mqttvscpd.8.md -o ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8
   )
 
-  add_custom_target(man ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/vscpd.8)
+  add_custom_target(man ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8)
 endif()
 
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/vscpd.8
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8
   DESTINATION ${CMAKE_INSTALL_MANDIR}/man8
 )

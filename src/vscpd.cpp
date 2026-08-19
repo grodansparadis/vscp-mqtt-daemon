@@ -147,8 +147,8 @@ main(int argc, char **argv)
   rootFolder   = "c:\\ProgramData\\vscp\\";
   strcfgfile   = "c:\\ProgramData\\vscp\\vscpd.json";
 #else
-  rootFolder   = "/var/lib/vscp/";
-  strcfgfile   = "/etc/vscp/vscpd.json";
+  rootFolder   = "/var/lib/vscp/mqttvscpd/";
+  strcfgfile   = "/etc/vscp/mqttvscpd.json";
 #endif  
   gbStopDaemon = false;
 
@@ -186,7 +186,7 @@ main(int argc, char **argv)
         break;
         
       case 'v':
-        fprintf(stderr, "%s\n", VSCPD_DISPLAY_VERSION);
+        fprintf(stderr, "%s\n", MQTTVSCPD_DISPLAY_VERSION);
         exit(0);
         break;
 
@@ -261,8 +261,8 @@ main(int argc, char **argv)
   // Change working directory to VSCP root folder
   if (chdir((const char *) rootFolder.c_str())) {
     console->warn("Failed to change dir to rootdir.");
-    if (-1 == chdir("/var/lib/vscp/vscpd")) {
-      console->warn("Unable to chdir to home folder [/var/lib/vscp/vscpd] errno=%d", errno);
+    if (-1 == chdir("/var/lib/vscp/mqttvscpd")) {
+      console->warn("Unable to chdir to home folder [/var/lib/vscp/mqttvscpd] errno=%d", errno);
     }
 
     unlink("/var/run/vscpd.pid");
@@ -418,9 +418,9 @@ copyleft(void)
 {
   fprintf(stderr, "\n\n");
   fprintf(stderr, "vscpd - ");
-  fprintf(stderr, VSCPD_DISPLAY_VERSION);
+  fprintf(stderr, MQTTVSCPD_DISPLAY_VERSION);
   fprintf(stderr, "\n");
-  fprintf(stderr, VSCPD_COPYRIGHT);
+  fprintf(stderr, MQTTVSCPD_COPYRIGHT);
   fprintf(stderr, "\n");
   fprintf(stderr, "\n");
   fprintf(stderr,

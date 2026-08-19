@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for vscpd
+# postinst script for mqttvscpd
 #
 # see: dh_installdeb(1)
 
@@ -8,6 +8,7 @@ set -e
 VSCPD_DEFAULT_FILE=/etc/default/vscp
 
 setup_vscp_config() {
+	mkdir -p /etc/vscp/certs
 	
     if ! getent passwd vscp >/dev/null; then
         adduser --disabled-password --quiet --system \
@@ -24,9 +25,8 @@ setup_vscp_config() {
     chmod g+s /var/metrics
     chgrp vscp /var/metrics
 
-    if [ -f /etc/vscp ]; then
-        # neither report_crashes nor report_metrics is used by vscp
-        rm /etc/vscp/vscpd.json
+    if [ -d /etc/vscp ]; then
+        :
     fi
 }
 
@@ -36,16 +36,24 @@ setup_vscpd_user() {
 	fi
 
 	if ! getent passwd vscp >/dev/null; then
-		adduser --quiet --system --no-create-home --ingroup vscp --home /var/lib/vscp/vscpd --shell /usr/sbin/nologin vscp vscp
+		adduser --quiet --system --no-create-home --ingroup vscp --home /var/lib/vscp/mqttvscpd --shell /usr/sbin/nologin vscp vscp
 	fi
 }
 
-setup_vscpd_systemd() {
-  /usr/bin/systemctl enable vscpd.service
-  /usr/bin/systemctl start vscpd
+setup_mqttvscpd_systemd() {
+  /usr/bin/systemctl enable mqttvscpd.service
+  /usr/bin/systemctl start mqttvscpd
 }
 
 fix_permissions() {
+  mkdir -p /var/lib/vscp/drivers/level1 \
+           /var/lib/vscp/drivers/level2 \
+           /var/lib/vscp/mqttvscpd \
+           /var/lib/vscp/web/html/images \
+           /var/lib/vscp/web/html/css \
+           /var/lib/vscp/web/html/js \
+           /etc/vscp/certs \
+           /var/log/vscp
   chown vscp /var/lib/vscp
   chgrp vscp /var/lib/vscp
   chmod a+x /var/lib/vscp
@@ -57,9 +65,9 @@ fix_permissions() {
   chown vscp /var/lib/vscp/drivers/level2
   chgrp vscp /var/lib/vscp/drivers/level2
   chmod a+x /var/lib/vscp/drivers/level2
-  chown vscp /var/lib/vscp/vscpd
-  chgrp vscp /var/lib/vscp/vscpd
-  chmod a+x /var/lib/vscp/vscpd
+  chown vscp /var/lib/vscp/mqttvscpd
+  chgrp vscp /var/lib/vscp/mqttvscpd
+  chmod a+x /var/lib/vscp/mqttvscpd
   chown vscp /var/lib/vscp/web
   chgrp vscp /var/lib/vscp/web
   chmod a+x /var/lib/vscp/web
@@ -83,7 +91,7 @@ fix_permissions() {
   chmod 600 /etc/vscp/vscp.key
   chown vscp /var/log/vscp
   chgrp vscp /var/log/vscp
-  chmod 755 var/log/vscp  
+  chmod 755 /var/log/vscp
 }
 
 case "$1" in
@@ -104,17 +112,17 @@ esac
 
 # Automatically added by dh_systemd_enable
 # This will only remove masks created by d-s-h on package removal.
-deb-systemd-helper unmask vscpd.service >/dev/null || true
+deb-systemd-helper unmask mqttvscpd.service >/dev/null || true
 
 # was-enabled defaults to true, so new installations run enable.
-if deb-systemd-helper --quiet was-enabled vscpd.service; then
+if deb-systemd-helper --quiet was-enabled mqttvscpd.service; then
 	# Enables the unit on first installation, creates new
 	# symlinks on upgrades if the unit file has changed.
-	deb-systemd-helper enable vscpd.service >/dev/null || true
+	deb-systemd-helper enable mqttvscpd.service >/dev/null || true
 else
 	# Update the statefile to add new symlinks (if any), which need to be
 	# cleaned up on purge. Also remove old symlinks.
-	deb-systemd-helper update-state vscpd.service >/dev/null || true
+	deb-systemd-helper update-state mqttvscpd.service >/dev/null || true
 fi
 # End automatically added section
 # Automatically added by dh_systemd_start
@@ -125,7 +133,7 @@ if [ -d /run/systemd/system ]; then
 	else
 		_dh_action=start
 	fi
-	deb-systemd-invoke $_dh_action vscpd.service >/dev/null || true
+	deb-systemd-invoke $_dh_action mqttvscpd.service >/dev/null || true
 fi
 # End automatically added section
 

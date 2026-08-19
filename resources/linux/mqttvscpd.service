@@ -7,13 +7,12 @@ Wants=network-online.target
 [Service]
 Type=notify
 NotifyAccess=main
-ExecStart=/usr/sbin/vscpd -s -c /etc/vscp/vscpd.json
+ExecStart=/usr/sbin/mqttvscpd -s -c /etc/vscp/mqttvscpd.json
 ExecReload=/bin/kill -HUP $MAINPID
 # Auto restart on crash
 Restart=on-failure
 RestartSec=20
 # Tag things in the log
-SysLogIdentifier=vscpd
 User=vscp
 Group=vscp
 

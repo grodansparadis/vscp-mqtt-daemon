@@ -12,7 +12,7 @@ When you change something in the configuration file you have to restart the VSCP
 sudo systemctl restart vscpd
 ```
 
-If something is wrong the VSCP daemon may not start. Check the log file at **/var/log/vscpd.log**. You can also use
+If something is wrong the VSCP daemon may not start. Check the log file at **/var/log/mqttvscpd.log**. You can also use
 
 ```bash
 ps aux | grep vscpd
