@@ -107,7 +107,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          deb_file=$(find . -maxdepth 1 -name 'mqttvscpd_*.deb' -print -quit)
+          deb_file=$(find . -type f -name 'mqttvscpd_*.deb' -print -quit)
           if [ -z "$deb_file" ]; then
             echo "No Debian package produced" >&2
             exit 1
@@ -187,7 +187,7 @@ jobs:
               "-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP";
             cmake --build build --parallel;
             cpack --config build/CPackConfig.cmake -C Release;
-            deb_file=$(find . -maxdepth 1 -name 'mqttvscpd_*.deb' -print -quit);
+            deb_file=$(find . -type f -name 'mqttvscpd_*.deb' -print -quit);
             if [ -z "$deb_file" ]; then
               echo 'No Debian package produced' >&2;
               exit 1;
