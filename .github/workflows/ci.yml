@@ -50,20 +50,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
+          fetch-depth: 0
           submodules: recursive
 
-      - name: Set mainline version
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      - name: Set build version
         shell: bash
-        run: |
-          year=$(date -u +%y)
-          month=$(date -u +%m)
-          patch=$(git rev-list --count --first-parent HEAD)
-          perl -pi -e "s/(MQTTVSCPD_VERSION_MAJOR\s+)\d+/\${1}${year}/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_VERSION_MINOR\s+)\d+/\${1}${month}/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_VERSION_PATCH\s+)\d+/\${1}${patch}/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_VERSION_STRING\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_DISPLAY_VERSION\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
+        run: bash scripts/update-version.sh
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -164,20 +156,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
+          fetch-depth: 0
           submodules: recursive
 
-      - name: Set mainline version
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      - name: Set build version
         shell: bash
-        run: |
-          year=$(date -u +%y)
-          month=$(date -u +%m)
-          patch=$(git rev-list --count --first-parent HEAD)
-          perl -pi -e "s/(MQTTVSCPD_VERSION_MAJOR\s+)\d+/\${1}${year}/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_VERSION_MINOR\s+)\d+/\${1}${month}/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_VERSION_PATCH\s+)\d+/\${1}${patch}/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_VERSION_STRING\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
-          perl -pi -e "s/(MQTTVSCPD_DISPLAY_VERSION\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
+        run: bash scripts/update-version.sh
 
       - name: Enable ARM emulation
         uses: docker/setup-qemu-action@v3
