@@ -65,6 +65,7 @@ jobs:
             libmosquitto-dev \
             libssl-dev \
             libsystemd-dev \
+            mosquitto \
             pandoc \
             pkg-config \
             rpm
@@ -101,6 +102,18 @@ jobs:
       - name: Package
         run: cpack --config build/CPackConfig.cmake -C Release
         working-directory: ${{ github.workspace }}
+
+      - name: Validate Debian package
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          deb_file=$(find . -type f -name 'mqttvscpd_*.deb' -print -quit)
+          if [ -z "$deb_file" ]; then
+            echo "No Debian package produced" >&2
+            exit 1
+          fi
+          bash resources/debpkg/validate-package.sh "$deb_file"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
@@ -153,9 +166,9 @@ jobs:
           -v "${{ github.workspace }}:/workspace"
           -w /workspace
           ${{ matrix.image }}
-          bash -euxo pipefail -c '
-            export DEBIAN_FRONTEND=noninteractive;
-            apt-get update;
+          bash -euxo pipefail -c "
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
             apt-get install -y \
               build-essential \
               cmake \
@@ -166,17 +179,25 @@ jobs:
               libmosquitto-dev \
               libssl-dev \
               libsystemd-dev \
+              mosquitto \
               pandoc \
               pkg-config \
-              rpm;
+              python3 \
+              rpm
             cmake -S . -B build \
               -DCMAKE_BUILD_TYPE=Release \
               -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER} \
-              "-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP";
-            cmake --build build --parallel;
-            cpack --config build/CPackConfig.cmake -C Release;
+              '-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP'
+            cmake --build build --parallel
+            cpack --config build/CPackConfig.cmake -C Release
+            deb_file=\$(find . -type f -name \"mqttvscpd_*.deb\" -print -quit)
+            if [ -z \"\$deb_file\" ]; then
+              echo \"No Debian package produced\" >&2
+              exit 1
+            fi
+            bash resources/debpkg/validate-package.sh \"\$deb_file\"
             file mqtt-vscpd* || true
-          '
+          "
 
       - name: Upload Raspberry Pi artifacts
         uses: actions/upload-artifact@v5
