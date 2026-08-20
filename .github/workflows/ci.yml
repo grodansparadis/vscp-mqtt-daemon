@@ -65,6 +65,7 @@ jobs:
             libmosquitto-dev \
             libssl-dev \
             libsystemd-dev \
+            mosquitto \
             pandoc \
             pkg-config \
             rpm
@@ -178,6 +179,7 @@ jobs:
               libmosquitto-dev \
               libssl-dev \
               libsystemd-dev \
+              mosquitto \
               pandoc \
               pkg-config \
               rpm;
