@@ -59,11 +59,11 @@ jobs:
           year=$(date -u +%y)
           month=$(date -u +%m)
           patch=$(git rev-list --count --first-parent HEAD)
-          sed -i -E "s/(MQTTVSCPD_VERSION_MAJOR[[:space:]]+)[0-9]+/\\1${year}/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_VERSION_MINOR[[:space:]]+)[0-9]+/\\1${month}/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_VERSION_PATCH[[:space:]]+)[0-9]+/\\1${patch}/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_VERSION_STRING[[:space:]]+).*/\\1\"${year}.${month}.${patch}\"/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_DISPLAY_VERSION[[:space:]]+).*/\\1\"${year}.${month}.${patch}\"/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_MAJOR\s+)\d+/\${1}${year}/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_MINOR\s+)\d+/\${1}${month}/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_PATCH\s+)\d+/\${1}${patch}/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_STRING\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_DISPLAY_VERSION\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -173,11 +173,11 @@ jobs:
           year=$(date -u +%y)
           month=$(date -u +%m)
           patch=$(git rev-list --count --first-parent HEAD)
-          sed -i -E "s/(MQTTVSCPD_VERSION_MAJOR[[:space:]]+)[0-9]+/\\1${year}/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_VERSION_MINOR[[:space:]]+)[0-9]+/\\1${month}/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_VERSION_PATCH[[:space:]]+)[0-9]+/\\1${patch}/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_VERSION_STRING[[:space:]]+).*/\\1\"${year}.${month}.${patch}\"/" src/version.h
-          sed -i -E "s/(MQTTVSCPD_DISPLAY_VERSION[[:space:]]+).*/\\1\"${year}.${month}.${patch}\"/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_MAJOR\s+)\d+/\${1}${year}/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_MINOR\s+)\d+/\${1}${month}/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_PATCH\s+)\d+/\${1}${patch}/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_VERSION_STRING\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
+          perl -pi -e "s/(MQTTVSCPD_DISPLAY_VERSION\s+).*/\${1}\"${year}.${month}.${patch}\"/" src/version.h
 
       - name: Enable ARM emulation
         uses: docker/setup-qemu-action@v3
