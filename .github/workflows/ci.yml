@@ -102,6 +102,18 @@ jobs:
         run: cpack --config build/CPackConfig.cmake -C Release
         working-directory: ${{ github.workspace }}
 
+      - name: Validate Debian package
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          deb_file=$(find . -maxdepth 1 -name 'mqttvscpd_*.deb' -print -quit)
+          if [ -z "$deb_file" ]; then
+            echo "No Debian package produced" >&2
+            exit 1
+          fi
+          bash resources/debpkg/validate-package.sh "$deb_file"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
@@ -175,6 +187,12 @@ jobs:
               "-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP";
             cmake --build build --parallel;
             cpack --config build/CPackConfig.cmake -C Release;
+            deb_file=$(find . -maxdepth 1 -name 'mqttvscpd_*.deb' -print -quit);
+            if [ -z "$deb_file" ]; then
+              echo 'No Debian package produced' >&2;
+              exit 1;
+            fi;
+            bash resources/debpkg/validate-package.sh "$deb_file";
             file mqtt-vscpd* || true
           '
 
