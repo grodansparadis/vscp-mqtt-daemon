@@ -80,13 +80,20 @@ trap cleanup EXIT
 
 create_validation_config() {
   local config_path="$work_dir/mqttvscpd-validation.json"
-  python3 - "$config_path" "$validation_user" <<'PY'
+  local validation_root="$work_dir/root"
+  local validation_db_path="$validation_root/vscp_events.sqlite3"
+  local validation_log_path="$validation_root/mqttvscpd-validation.log"
+  mkdir -p "$validation_root"
+  python3 - "$config_path" "$validation_user" "$validation_root" "$validation_db_path" "$validation_log_path" <<'PY'
 import json
 import sys
 
 source_path = "/etc/vscp/mqttvscpd.json"
 target_path = sys.argv[1]
 validation_user = sys.argv[2]
+validation_root = sys.argv[3]
+validation_db_path = sys.argv[4]
+validation_log_path = sys.argv[5]
 
 with open(source_path, "r", encoding="utf-8") as input_file:
     config = json.load(input_file)
@@ -103,6 +110,14 @@ def replace_hosts(value):
 
 updated = replace_hosts(config)
 updated["runasuser"] = validation_user
+updated["classtypedb"] = validation_db_path
+
+logging = updated.setdefault("logging", {})
+if not isinstance(logging, dict):
+    logging = {}
+    updated["logging"] = logging
+logging["file-enable-log"] = True
+logging["file-path"] = validation_log_path
 
 with open(target_path, "w", encoding="utf-8") as output_file:
     json.dump(updated, output_file, indent=2)
@@ -171,7 +186,7 @@ start_and_stop_daemon() {
   config_path="$(create_validation_config)"
   start_local_broker
 
-  run_as_validation_user /usr/sbin/mqttvscpd -s -c "$config_path" >"$log_file" 2>&1 &
+  run_as_validation_user /usr/sbin/mqttvscpd -s -r "$work_dir/root" -c "$config_path" >"$log_file" 2>&1 &
   local pid=$!
 
   sleep 8
