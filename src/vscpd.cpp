@@ -302,7 +302,7 @@ main(int argc, char **argv)
   my_action.sa_handler = _sighandlerStop;
   my_action.sa_flags   = SA_RESTART;
   sigaction(SIGHUP, &my_action, NULL);
-#endif // WIN32
+#endif // !WIN32
 
   // Create the control object
   gpobj = new CControlObject();
