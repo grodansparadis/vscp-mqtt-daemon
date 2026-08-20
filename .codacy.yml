@@ -1,0 +1,3 @@
+engines:
+  exclude-paths:
+    - third-party/**
