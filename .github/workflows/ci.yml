@@ -182,6 +182,7 @@ jobs:
               mosquitto \
               pandoc \
               pkg-config \
+              python3 \
               rpm
             cmake -S . -B build \
               -DCMAKE_BUILD_TYPE=Release \
