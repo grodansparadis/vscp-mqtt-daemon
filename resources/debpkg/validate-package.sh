@@ -31,15 +31,23 @@ run_cmd() {
   fi
 }
 
-run_as_vscp() {
+validation_user="$(id -un)"
+
+run_as_validation_user() {
   if [ "$(id -u)" -eq 0 ]; then
-    if command -v runuser >/dev/null 2>&1; then
-      runuser -u vscp -- "$@"
+    if [ "$validation_user" = "root" ]; then
+      "$@"
+    elif command -v runuser >/dev/null 2>&1; then
+      runuser -u "$validation_user" -- "$@"
     else
-      sudo -u vscp "$@"
+      sudo -u "$validation_user" "$@"
     fi
   else
-    sudo -u vscp "$@"
+    if [ "$validation_user" = "$(id -un)" ]; then
+      "$@"
+    else
+      sudo -u "$validation_user" "$@"
+    fi
   fi
 }
 
@@ -72,12 +80,13 @@ trap cleanup EXIT
 
 create_validation_config() {
   local config_path="$work_dir/mqttvscpd-validation.json"
-  python3 - "$config_path" <<'PY'
+  python3 - "$config_path" "$validation_user" <<'PY'
 import json
 import sys
 
 source_path = "/etc/vscp/mqttvscpd.json"
 target_path = sys.argv[1]
+validation_user = sys.argv[2]
 
 with open(source_path, "r", encoding="utf-8") as input_file:
     config = json.load(input_file)
@@ -93,6 +102,7 @@ def replace_hosts(value):
     return value
 
 updated = replace_hosts(config)
+updated["runasuser"] = validation_user
 
 with open(target_path, "w", encoding="utf-8") as output_file:
     json.dump(updated, output_file, indent=2)
@@ -161,7 +171,7 @@ start_and_stop_daemon() {
   config_path="$(create_validation_config)"
   start_local_broker
 
-  run_as_vscp /usr/sbin/mqttvscpd -s -c "$config_path" >"$log_file" 2>&1 &
+  run_as_validation_user /usr/sbin/mqttvscpd -s -c "$config_path" >"$log_file" 2>&1 &
   local pid=$!
 
   sleep 8
