@@ -52,7 +52,7 @@ start_and_stop_daemon() {
   log_file="$(mktemp)"
   trap 'rm -f "$log_file"' RETURN
 
-  /usr/sbin/mqttvscpd -s -c /etc/vscp/mqttvscpd.json >"$log_file" 2>&1 &
+  run_cmd /usr/sbin/mqttvscpd -s -c /etc/vscp/mqttvscpd.json >"$log_file" 2>&1 &
   local pid=$!
 
   sleep 8
