@@ -289,7 +289,7 @@ CControlObject::CControlObject()
   // Logging defaults
   m_fileLogLevel     = spdlog::level::info;
   m_fileLogPattern   = "[vscpd] [%^%l%$] %v";
-  m_path_to_log_file = "/var/log/vscp/mqttvscpd.log";
+  m_path_to_log_file = "/var/log/vscp/mqttvscpd.log"; // Directory is created automatically if missing
   m_max_log_size     = 5242880;
   m_max_log_files    = 7;
 

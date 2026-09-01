@@ -98,6 +98,34 @@ copyleft(void);
 void
 help(char *szPrgname);
 
+// Create all missing directories in path (mkdir -p equivalent)
+static bool
+createDirectoryRecursive(const std::string &path)
+{
+  std::string sub;
+  size_t pos = 0;
+
+  if (path.empty()) {
+    return false;
+  }
+
+  while (pos != std::string::npos) {
+    pos = path.find('/', pos + 1);
+    sub = (pos == std::string::npos) ? path : path.substr(0, pos);
+    if (sub.empty() || sub == "/") {
+      continue;
+    }
+    struct stat st;
+    if (0 != stat(sub.c_str(), &st)) {
+      if (0 != mkdir(sub.c_str(), 0755) && EEXIST != errno) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 void
 _sighandlerStop(int sig)
 {
@@ -334,6 +362,18 @@ main(int argc, char **argv)
   }
 
   try {
+    // Make sure the log file directory exists (create it if not)
+    std::string logDir = gpobj->m_path_to_log_file;
+    size_t slashPos     = logDir.find_last_of('/');
+    if (std::string::npos != slashPos) {
+      logDir = logDir.substr(0, slashPos);
+      if (logDir.length() && !vscp_fileExists(logDir.c_str())) {
+        if (!createDirectoryRecursive(logDir)) {
+          console->error("Failed to create log directory {}. [{}]", logDir, strerror(errno));
+        }
+      }
+    }
+
     auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(gpobj->m_path_to_log_file.c_str(),
                                                                                      gpobj->m_max_log_size,
                                                                                      gpobj->m_max_log_files);
