@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10...3.31)
 project(man LANGUAGES CXX C)
-set(PACKAGE_AUTHOR "Ake Hedman, the VSCP Project")
+set(PACKAGE_AUTHOR "Ake Hedman,  contributors,, the VSCP Project")
 
 # --- System Libraries ---
 include(GNUInstallDirs)

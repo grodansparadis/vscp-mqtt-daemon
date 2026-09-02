@@ -4,7 +4,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (C) 2000-2026 Ake Hedman, the VSCP project
+// Copyright (C) 2000-2026 Ake Hedman, contributors, the VSCP project
 // <info@vscp.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -81,8 +81,8 @@
 
 // Globals for the daemon
 int gbStopDaemon;
-uint64_t gDebugLevel   = 0;
 bool gbDontRunAsDaemon = false;
+uint64_t gDebugLevel   = 0;
 
 // The default random encryption key
 uint8_t __vscp_key[32] = { 0x2d, 0xbb, 0x07, 0x9a, 0x38, 0x98, 0x5a, 0xf0, 0x0e, 0xbe, 0xef,
@@ -172,11 +172,11 @@ main(int argc, char **argv)
   crcInit();
 
 #ifdef WIN32
-  rootFolder   = "c:\\ProgramData\\vscp\\";
-  strcfgfile   = "c:\\ProgramData\\vscp\\vscpd.json";
+  rootFolder   = VSCPD_DEFAULT_ROOT_FOLDER;
+  strcfgfile   = VSCPD_DEFAULT_CONFIG_FILE;
 #else
-  rootFolder   = "/var/lib/vscp/mqttvscpd/";
-  strcfgfile   = "/etc/vscp/mqttvscpd.json";
+  rootFolder   = VSCPD_DEFAULT_ROOT_FOLDER;
+  strcfgfile   = VSCPD_DEFAULT_CONFIG_FILE;
 #endif  
   gbStopDaemon = false;
 
@@ -193,6 +193,19 @@ main(int argc, char **argv)
         strcfgfile = optarg;
         break;
 
+        case 'd':
+        {
+          std::string debugFlags = optarg;
+          if (debugFlags.size() > 2 && debugFlags[0] == '0' && (debugFlags[1] == 'b' || debugFlags[1] == 'B')) {
+            gDebugLevel = std::stoull(debugFlags.substr(2), nullptr, 2);
+          }
+          else {
+            gDebugLevel = std::stoull(debugFlags);
+          }
+        }
+        console->info("Debug flags=%s\n", optarg);
+        break;
+
       case 'r':
         rootFolder = optarg;
         console->info("Will use rootfolder = %s", rootFolder.c_str());
@@ -201,11 +214,6 @@ main(int argc, char **argv)
       case 'k':
         // Set system key
         vscp_hexStr2ByteArray(__vscp_key, 32, optarg);
-        break;
-
-      case 'd':
-        gDebugLevel = std::stoull(optarg);
-        console->info("Debug flags=%s\n", optarg);
         break;
 
       case 'g':
@@ -335,9 +343,6 @@ main(int argc, char **argv)
   // Create the control object
   gpobj = new CControlObject();
 
-  // Tansfer read debug parameters if set
-  console->info("Debugflags (cmdline): 0x{0:x}", gDebugLevel);
-
   if (!gpobj->init(strcfgfile, rootFolder)) {
     console->critical("Can't initialize daemon. Exiting.\n");
 #ifndef WIN32
@@ -466,7 +471,7 @@ copyleft(void)
   fprintf(stderr,
           "The MIT License (MIT)"
           "\n"
-          "Copyright (C) 2000-2026 Ake Hedman, the VSCP project\n"
+          "Copyright (C) 2000-2026 Ake Hedman,  contributors,, contributors, the VSCP project\n"
           "<info@vscp.org>\n"
           "\n"
           "Permission is hereby granted, free of charge, to any person obtaining a "
@@ -512,10 +517,10 @@ help(char *szPrgname)
   fprintf(stderr, "\t-h\tThis help message.\n");
   fprintf(stderr, "\t-v\tPrint version. \n");
   fprintf(stderr, "\t-s\tStandalone (don't run as daemon). \n");
-  fprintf(stderr, "\t-r\tSpecify VSCP root folder. \n");
-  fprintf(stderr, "\t-c\tSpecify a configuration file. \n");
+  fprintf(stderr, "\t-r\tSpecify VSCP root folder (default:%s). \n", VSCPD_DEFAULT_ROOT_FOLDER);
+  fprintf(stderr, "\t-c\tSpecify a configuration file (with path). \n");
+  fprintf(stderr, "\t-d\tDebug flags (64 bit (bin/dec/hex value)). \n");
   fprintf(stderr, "\t-k\t32 byte encryption key string in hex format. \n");
-  fprintf(stderr, "\t-d\tDebug flags.");
-  fprintf(stderr, "that should be used (default: /etc/vscpd.json).\n");
-  fprintf(stderr, "\t-g\tPrint MIT license info.\n");
+  fprintf(stderr, "that should be used (default: %s).\n", VSCPD_DEFAULT_CONFIG_FILE);
+  fprintf(stderr, "\t-g\tPrint MIT license.\n");
 }

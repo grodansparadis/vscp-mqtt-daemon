@@ -4,7 +4,7 @@
 //
 // The MIT License (MIT)
 // 
-// Copyright (C) 2000-2026 Ake Hedman, the VSCP project <info@vscp.org>
+// Copyright (C) 2000-2026 Ake Hedman,  contributors,, the VSCP project <info@vscp.org>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,16 @@
 // Include the CANAL definitions
 #include <canal.h>
 
-/// Names of mutex's
+#ifdef WIN32
+#define VSCPD_DEFAULT_ROOT_FOLDER "c:\\ProgramData\\vscp\\mqttvscpd\\"
+#define VSCPD_DEFAULT_CONFIG_FILE "c:\\ProgramData\\vscp\\mqttvscpd.json"
+#else
+#define VSCPD_DEFAULT_ROOT_FOLDER "/var/lib/vscp/mqttvscpd/"
+#define VSCPD_DEFAULT_CONFIG_FILE "/etc/mqttvscpd.json"
+#endif
 
+
+/// Names of mutex's
 #define CANALD_CLIENT_OBJ_MUTEX "____CANAL_CLIENT_OBJ_MUTEX____"
 #define CANALD_DEVICE_OBJ_MUTEX "____CANAL_DEVICE_OBJ_MUTEX____"
 #define CANALD_SEND_OBJ_MUTEX "____CANAL_SEND_OBJ_MUTEX____"

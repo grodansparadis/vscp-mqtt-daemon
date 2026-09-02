@@ -1,7 +1,7 @@
 Source: mqttvscpd
 Section: net
 Priority: optional
-Maintainer: Ake Hedman <akhe@vscp.org>
+Maintainer: Ake Hedman,  contributors, <akhe@vscp.org>
 Build-Depends: debhelper (>= %COMPAT)
 
 Standards-Version: 4.3.0

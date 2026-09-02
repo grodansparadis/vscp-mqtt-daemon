@@ -9,7 +9,7 @@
 #define MQTTVSCPD_DISPLAY_VERSION "26.08.0"
 
 #define MQTTVSCPD_COPYRIGHT \
-	"Copyright (C) 2000-2026 Ake Hedman, the VSCP project, " \
+	"Copyright (C) 2000-2026 Ake Hedman,  contributors,, the VSCP project, " \
 	"https://www.vscp.org"
 
 #endif // MQTTVSCPD_VERSION_H
