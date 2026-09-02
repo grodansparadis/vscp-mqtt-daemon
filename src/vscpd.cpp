@@ -61,6 +61,7 @@
 
 #endif
 
+#include "vscp-udp-log.h"
 #include "canal-macro.h"
 #include "vscpd.h"
 #include "controlobject.h"

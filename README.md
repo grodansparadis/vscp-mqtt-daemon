@@ -12,6 +12,8 @@ This repository is for the mqtt-vscpd.  Got the repository for the [tcpip-vscpd]
 
 The daemon now builds from this repository root and links against the vendored VSCP sources in `third-party/vscp`.
 
+> Important: files under `third-party/` are vendored dependencies and should not be modified directly unless the task explicitly requires it. Keep project changes in the top-level source tree instead.
+
 ### Linux
 
 ```sh

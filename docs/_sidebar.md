@@ -21,6 +21,7 @@
 * Logging, diagnostic and debugging
   * [Solving problems and troubleshooting](solving_problems.md)
   * [logging](logging.md)
+  * [VSCP UDP log helper](vscp_udp_log.md)
 
 * Server/Service Discovery
  * [General](server_disovery.md)
