@@ -216,7 +216,7 @@ cd build
 If vcpkg is installed on the G: drive and the vcpkg triplet is x64-windows the following cmake commands can be used to compile the VSCP daemon on Windows.
 
 ```bash
-cmake .. -G "Visual Studio 17 2022" -DVCPKG_TARGET_TRIPLET=x64-windows  -D CMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=G:\vcpkg\scripts\buildsystems\vcpkg.cmake
+cmake .. -G "Visual Studio 18 2026" -DVCPKG_TARGET_TRIPLET=x64-windows  -D CMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=G:\vcpkg\scripts\buildsystems\vcpkg.cmake
 ```
 
 Build with

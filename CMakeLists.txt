@@ -83,9 +83,20 @@ target_link_libraries(mqttvscpd
         vscp_sqlite3)
 
 if(WIN32)
-    find_package(pthread REQUIRED)
+    find_package(Threads REQUIRED)
+    find_package(PThreads4W CONFIG QUIET)
+    if(NOT TARGET PThreads4W::PThreads4W_CXXEXC AND NOT TARGET PThreads4W::PThreads4W)
+        find_package(pthread CONFIG QUIET)
+    endif()
+
     if(TARGET PThreads4W::PThreads4W_CXXEXC)
         target_link_libraries(mqttvscpd PRIVATE PThreads4W::PThreads4W_CXXEXC)
+    elseif(TARGET PThreads4W::PThreads4W)
+        target_link_libraries(mqttvscpd PRIVATE PThreads4W::PThreads4W)
+    elseif(TARGET Threads::Threads)
+        target_link_libraries(mqttvscpd PRIVATE Threads::Threads)
+    elseif(MSVC)
+        message(FATAL_ERROR "No usable pthreads target found for MSVC. Install the PThreads4W/pthread dependency (for example via vcpkg) before building.")
     endif()
 
     target_link_libraries(mqttvscpd PRIVATE netapi32)
