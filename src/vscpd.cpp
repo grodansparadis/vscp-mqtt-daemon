@@ -42,6 +42,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef WIN32
+#include <direct.h>
+#endif
 
 #ifndef WIN32
 #ifdef __linux__
@@ -118,7 +121,11 @@ createDirectoryRecursive(const std::string &path)
     }
     struct stat st;
     if (0 != stat(sub.c_str(), &st)) {
+#ifdef WIN32
+      if (0 != _mkdir(sub.c_str()) && EEXIST != errno) {
+#else
       if (0 != mkdir(sub.c_str(), 0755) && EEXIST != errno) {
+#endif
         return false;
       }
     }
