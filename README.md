@@ -8,19 +8,21 @@
 
 ![](./docs/images/vscp_arcitecture.png)
 
-There are currently two daemons (servers) for the VSCP protocol. The VSCP MQTT daemon (**vscp-mqtt-daemon**) and the [VSCP tcp/ip daemon (vscp-tcpip-daemon)](https://github.com/grodansparadis/vscp-tcpip-daemon). 
+There are currently two daemons (servers) for the VSCP protocol. The VSCP MQTT daemon (**vscp-mqtt-daemon**) and the [VSCP tcp/ip daemon (vscp-tcpip-daemon)](https://github.com/grodansparadis/vscp-tcpip-daemon). They manily differ in the way they expose VSCP events.
 
-The **vscp-mqtt-daemon** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers. It support all level I and level II drivers.
+The **vscp-mqtt-daemon** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers and get data from a MQTT server. It support all level I and level II drivers.
 
-The **vscp-tcpip-daemon** export the VSCP tcp/ip link protocol and can just as the __vscp-mqtt-daemon__ connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface. It support all level I and level II drivers.
+The **vscp-tcpip-daemon** export the VSCP tcp/ip link protocol and can just as the __vscp-mqtt-daemon__ connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface. It support all level I and level II drivers. As there is a MQTT driver ([vscpl2drv-mqtt](https://github.com/grodansparadis/vscpl2drv-mqtt)) it is also possible to connect to MQTT servers with this daemon.
 
 This repository is for the __vscp-mqtt-daemon__.  The vscp-mqtt-daemon is available for Linux, Windows and Macintosh. Binaries is available for all platforms including Raspberrey Pi.
 
 ## Build
 
-The daemon now builds from this repository root and links against the vendored VSCP sources in `third-party/vscp`.
+Fetch the source code with
 
-> Important: files under `third-party/` are vendored dependencies and should not be modified directly unless the task explicitly requires it. Keep project changes in the top-level source tree instead.
+```bash
+git clone --recursive https://github.com/grodansparadis/vscp-mqtt-daemon.git
+``` 
 
 ### Linux
 
@@ -65,9 +67,9 @@ Default generators are:
 - macOS: `TGZ`
 - Windows: `ZIP` and `NSIS` when `makensis` is available
 
-## CI
+## Versioning
 
-GitHub Actions builds and packages the daemon on Linux, macOS, and Windows from `.github/workflows/ci.yml`.
+Versioning is **year.month.patch** where year is last two digits of the release year and month is the two digits of the release month (01-12) and patch is a push counter that is updated on each push to the repositories main branch.
 
 ## License
 

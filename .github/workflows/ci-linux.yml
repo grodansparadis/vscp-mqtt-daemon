@@ -73,7 +73,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: vscpd-Linux
+          name: vscpd-${{ env.VSCPD_VERSION }}-Linux
           if-no-files-found: error
           path: |
             *.deb

@@ -63,7 +63,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: vscpd-Windows
+          name: vscpd-${{ env.VSCPD_VERSION }}-Windows
           if-no-files-found: error
           path: |
             *.zip
