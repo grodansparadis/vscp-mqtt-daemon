@@ -5,7 +5,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (C) 2000-2026 Ake Hedman,  contributors,, the VSCP project
+// Copyright (C) 2000-2026 Ake Hedman,  contributors, the VSCP project
 // <info@vscp.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -103,8 +103,14 @@
 #include <mustache.hpp>
 #include <nlohmann/json.hpp> // Needs C++11  -std=c++11
 
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/udp_sink.h"
+#ifdef __linux__
+#include "spdlog/sinks/syslog_sink.h"
+#include <syslog.h> // for LOG_PID, LOG_USER, etc.
+#endif
 
 // https://github.com/nlohmann/json
 using json = nlohmann::json;
@@ -114,9 +120,7 @@ using namespace kainjow::mustache;
 #define UNUSED(x) (void) (x)
 void
 foo(const int i)
-{
-  UNUSED(i);
-}
+{ UNUSED(i); }
 
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
@@ -287,15 +291,26 @@ CControlObject::CControlObject()
   m_pathClassTypeDefinitionDb = "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3";
 
   // Logging defaults
+  m_bEnableFileLog   = false;
   m_fileLogLevel     = spdlog::level::info;
-  m_fileLogPattern   = "[vscpd] [%^%l%$] %v";
+  m_fileLogPattern   = "[mqttvscpd] [%^%l%$] %v";
   m_path_to_log_file = "/var/log/vscp/mqttvscpd.log"; // Directory is created automatically if missing
   m_max_log_size     = 5242880;
   m_max_log_files    = 7;
 
-  m_bEnableConsoleLog = false;
+  m_bEnableConsoleLog = true;
   m_consoleLogLevel   = spdlog::level::info;
-  m_consoleLogPattern = "[vscpd] [%^%l%$] %v";
+  m_consoleLogPattern = "[mqttvscpd] [%^%l%$] %v";
+
+  m_bEnableSysLog = false;
+  m_sysLogLevel   = spdlog::level::info;
+  m_sysLogIdent   = "mqttvscpd";
+
+  m_bEnableUdpLog = false;
+  m_udpLogHost    = "127.0.0.1";
+  m_udpLogPort    = 9999;
+  m_udpLogLevel   = spdlog::level::info;
+  m_udpLogPattern = "[%Y-%m-%d %H:%M:%S.%e] [%l] %v";
 
   // Nill the GUID
   m_guid.clear();
@@ -403,6 +418,70 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     return FALSE;
   }
 
+  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
+    spdlog::debug("Configuration file read successfully.");
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  //                           Setup logging
+  /////////////////////////////////////////////////////////////////////////////
+
+  // 1. Console sink — available immediately, before config is read
+  auto existing = spdlog::get("console");
+  if (existing) {
+    spdlog::drop("console");
+  }
+
+  auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+  console_sink->set_level(spdlog::level::warn);
+  console_sink->set_pattern("[%^%l%$] %v");
+
+  auto logger = std::make_shared<spdlog::logger>("app", console_sink);
+  logger->set_level(spdlog::level::trace); // permissive; each sink filters its own level
+  spdlog::set_default_logger(logger);
+
+  spdlog::info("starting up, console-only for now");
+
+  // 2. File sink — everything, for later inspection
+  auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("/tmp/mqttvscpd.log", true);
+  file_sink->set_level(spdlog::level::trace);
+  file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%s:%#] %v");
+  logger->sinks().push_back(file_sink);
+
+#ifdef __linux__
+  // syslog
+  if (m_bEnableSysLog) {
+    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(
+      m_sysLogIdent.c_str(), // ident — shows up as the program name in syslog entries
+      LOG_PID,               // syslog_option — include PID in each message
+      LOG_DAEMON,            // syslog_facility — LOG_USER, LOG_DAEMON, LOG_LOCAL0..7, etc.
+      false                  // syslog set timestamp etc
+    );
+    syslog_sink->set_level(m_sysLogLevel);
+    logger->sinks().push_back(syslog_sink);
+  }
+#endif
+
+  // UDP sink — only info+ to avoid flooding the network, terse pattern
+  if (m_bEnableUdpLog) {
+    try {
+      spdlog::sinks::udp_sink_config udp_cfg(m_udpLogHost.c_str(), m_udpLogPort);
+      auto udp_sink = std::make_shared<spdlog::sinks::udp_sink_mt>(udp_cfg);
+      udp_sink->set_level(m_udpLogLevel);
+      udp_sink->set_pattern(m_udpLogPattern.c_str());
+      logger->sinks().push_back(udp_sink);
+    }
+    catch (const spdlog::spdlog_ex &ex) {
+      // std::printf("UDP logging init failed: %s\n", ex.what());
+      spdlog::error("UDP logging init failed: {}", ex.what());
+    }
+  }
+
+  spdlog::info("Starting mqttvscpd daemon, version {} ({})", MQTTVSCPD_DISPLAY_VERSION, MQTTVSCPD_COPYRIGHT);
+  spdlog::debug("debug message - file only (console filters warn+, udp filters info+)");
+  spdlog::warn("warn message");
+  spdlog::error("error message");
+
 #ifndef WIN32
   if (m_runAsUser.length()) {
     int rv;
@@ -469,12 +548,14 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     sqlite3 *db_vscp_classtype;
     if (SQLITE_OK == sqlite3_open(m_pathClassTypeDefinitionDb.c_str(), &db_vscp_classtype)) {
 
-      // * * *   C L A S S E S   * * * 
+      // * * *   C L A S S E S   * * *
 
       sqlite3_stmt *ppStmt;
       if (SQLITE_OK !=
           (rv = sqlite3_prepare(db_vscp_classtype, "SELECT class,name,token from vscp_class", -1, &ppStmt, NULL))) {
-        spdlog::error("Failed to prepare class fetch from class & type database. rv={0} {1}", rv, sqlite3_errmsg(db_vscp_classtype));
+        spdlog::error("Failed to prepare class fetch from class & type database. rv={0} {1}",
+                      rv,
+                      sqlite3_errmsg(db_vscp_classtype));
       }
 
       while (SQLITE_ROW == sqlite3_step(ppStmt)) {
@@ -495,8 +576,11 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       // * * *   T Y P E S   * * *
 
       if (SQLITE_OK !=
-          (rv = sqlite3_prepare(db_vscp_classtype, "SELECT type,link_to_class,token from vscp_type", -1, &ppStmt, NULL))) {
-        spdlog::error("Failed to prepare type fetch from class & type database. rv={0} {1}", rv, sqlite3_errmsg(db_vscp_classtype));
+          (rv =
+             sqlite3_prepare(db_vscp_classtype, "SELECT type,link_to_class,token from vscp_type", -1, &ppStmt, NULL))) {
+        spdlog::error("Failed to prepare type fetch from class & type database. rv={0} {1}",
+                      rv,
+                      sqlite3_errmsg(db_vscp_classtype));
       }
 
       while (SQLITE_ROW == sqlite3_step(ppStmt)) {
@@ -543,7 +627,8 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
         // Read in discovered nodes to in memory map
 
         sqlite3_stmt *ppStmt;
-        if (SQLITE_OK != (rv = sqlite3_prepare(m_db_vscp_daemon, "SELECT guid,name from discovery", -1, &ppStmt, NULL))) {
+        if (SQLITE_OK !=
+            (rv = sqlite3_prepare(m_db_vscp_daemon, "SELECT guid,name from discovery", -1, &ppStmt, NULL))) {
           spdlog::error("Failed to prepare discovery node fetch. rv={0} {1}", rv, sqlite3_errmsg(m_db_vscp_daemon));
         }
 
@@ -1086,7 +1171,7 @@ CControlObject::periodicEvents(void)
   ex.data[1] = (uint8_t) ((time32 >> 24) & 0xff); // Time since epoch MSB
   ex.data[2] = (uint8_t) ((time32 >> 16) & 0xff);
   ex.data[3] = (uint8_t) ((time32 >> 8) & 0xff);
-  ex.data[4] = (uint8_t) ((time32) &0xff); // Time since epoch LSB
+  ex.data[4] = (uint8_t) ((time32) & 0xff); // Time since epoch LSB
 
   if (!sendEvent(&ex)) {
     spdlog::error("Controlobject: Failed to send segment controller heartbeat");
@@ -1264,12 +1349,11 @@ CControlObject::startDeviceWorkerThreads(void)
       pDeviceItem->startDriver(this);
 
     } // Valid device item
-    
   }
 
   if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-      spdlog::debug("controlobject: [Driver] - Drivers started (if any)");
-    }
+    spdlog::debug("controlobject: [Driver] - Drivers started (if any)");
+  }
 
   return true;
 }
@@ -1454,27 +1538,31 @@ CControlObject::getMacAddress(cguid &guid)
   // macOS implementation using getifaddrs
   bool rv = false;
   struct ifaddrs *iflist, *cur;
-  
+
   // Clear the GUID
   guid.clear();
-  
+
   if (getifaddrs(&iflist) == 0) {
     for (cur = iflist; cur; cur = cur->ifa_next) {
       if ((cur->ifa_addr->sa_family == AF_LINK) && cur->ifa_addr) {
-        struct sockaddr_dl *sdl = (struct sockaddr_dl *)cur->ifa_addr;
+        struct sockaddr_dl *sdl = (struct sockaddr_dl *) cur->ifa_addr;
         if (sdl->sdl_alen == 6) {
-          unsigned char *mac = (unsigned char *)LLADDR(sdl);
+          unsigned char *mac = (unsigned char *) LLADDR(sdl);
           // Skip loopback and other non-ethernet interfaces
-          if (mac[0] == 0 && mac[1] == 0 && mac[2] == 0 &&
-              mac[3] == 0 && mac[4] == 0 && mac[5] == 0) {
+          if (mac[0] == 0 && mac[1] == 0 && mac[2] == 0 && mac[3] == 0 && mac[4] == 0 && mac[5] == 0) {
             continue;
           }
-          
+
           if (gDebugLevel & VSCP_DEBUG_EXTRA) {
             spdlog::debug("Ethernet MAC address: {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}",
-                          mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+                          mac[0],
+                          mac[1],
+                          mac[2],
+                          mac[3],
+                          mac[4],
+                          mac[5]);
           }
-          
+
           guid.setAt(0, 0xff);
           guid.setAt(1, 0xff);
           guid.setAt(2, 0xff);
@@ -1498,11 +1586,11 @@ CControlObject::getMacAddress(cguid &guid)
     }
     freeifaddrs(iflist);
   }
-  
+
   if (!rv) {
     spdlog::error("Failed to get hardware address.");
   }
-  
+
   return rv;
 
 #else
@@ -2084,7 +2172,261 @@ CControlObject::readJSON(const json &j)
         spdlog::debug("ReadConfig: Failed to read LOGGING 'console-pattern' Defaults will be used.");
       }
     }
-  }
+
+    // syslog
+
+    // Logging: syslog-enable-log
+    if (j["logging"].contains("syslog-enable-log")) {
+      try {
+        m_bEnableSysLog = j["logging"]["syslog-enable-log"].get<bool>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'syslog-enable-log' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'syslog-enable-log' due to unknown error.");
+      }
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: LOGGING 'syslog-enable-log' set to {}", m_bEnableSysLog ? "true" : "false");
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-enable-log' Defaults will be used.");
+      }
+    }
+
+    // Logging: syslog-log-level
+    if (j["logging"].contains("syslog-log-level")) {
+      std::string str;
+      try {
+        str = j["logging"]["syslog-log-level"].get<std::string>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'syslog-log-level' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'syslog-log-level' due to unknown error.");
+      }
+      vscp_makeLower(str);
+      if (std::string::npos != str.find("off")) {
+        m_sysLogLevel = spdlog::level::off;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'off'.");
+        }
+      }
+      else if (std::string::npos != str.find("critical")) {
+        m_sysLogLevel = spdlog::level::critical;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'critical'.");
+        }
+      }
+      else if (std::string::npos != str.find("err")) {
+        m_sysLogLevel = spdlog::level::err;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'err'.");
+        }
+      }
+      else if (std::string::npos != str.find("warn")) {
+        m_sysLogLevel = spdlog::level::warn;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'warn'.");
+        }
+      }
+      else if (std::string::npos != str.find("info")) {
+        m_sysLogLevel = spdlog::level::info;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'info'.");
+        }
+      }
+      else if (std::string::npos != str.find("debug")) {
+        m_sysLogLevel = spdlog::level::debug;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'debug'.");
+        }
+      }
+      else if (std::string::npos != str.find("trace")) {
+        m_sysLogLevel = spdlog::level::trace;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'trace'.");
+        }
+      }
+      else {
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' has invalid value [{}]. Default value used.", str);
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-log-level' Defaults will be used.");
+      }
+    }
+
+    // Logging: syslog-ident
+    if (j["logging"].contains("syslog-ident")) {
+      try {
+        m_sysLogIdent = j["logging"]["syslog-ident"].get<std::string>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'syslog-ident' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'syslog-ident' due to unknown error.");
+      }
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: LOGGING 'syslog-ident' set to {}.", m_sysLogIdent);
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-ident' Defaults will be used.");
+      }
+    }
+
+    // UDP logging
+    if (j["logging"].contains("udp-enable-log")) {
+      try {
+        m_bEnableUdpLog = j["logging"]["udp-enable-log"].get<bool>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'udp-enable-log' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'udp-enable-log' due to unknown error.");
+      }
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: LOGGING 'udp-enable-log' set to {}", m_bEnableUdpLog ? "true" : "false");
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-enable-log' Defaults will be used.");
+      }
+    }
+
+    // UDP logging level
+    if (j["logging"].contains("udp-log-level")) {
+      std::string str;
+      try {
+        str = j["logging"]["udp-log-level"].get<std::string>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'udp-log-level' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'udp-log-level' due to unknown error.");
+      }
+      vscp_makeLower(str);
+      if (std::string::npos != str.find("off")) {
+        m_udpLogLevel = spdlog::level::off;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'off'.");
+        }
+      }
+      else if (std::string::npos != str.find("critical")) {
+        m_udpLogLevel = spdlog::level::critical;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'critical'.");
+        }
+      }
+      else if (std::string::npos != str.find("err")) {
+        m_udpLogLevel = spdlog::level::err;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'err'.");
+        }
+      }
+      else if (std::string::npos != str.find("warn")) {
+        m_udpLogLevel = spdlog::level::warn;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'warn'.");
+        }
+      }
+      else if (std::string::npos != str.find("info")) {
+        m_udpLogLevel = spdlog::level::info;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'info'.");
+        }
+      }
+      else if (std::string::npos != str.find("debug")) {
+        m_udpLogLevel = spdlog::level::debug;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'debug'.");
+        }
+      }
+      else if (std::string::npos != str.find("trace")) {
+        m_udpLogLevel = spdlog::level::trace;
+        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'trace'.");
+        }
+      }
+      else {
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' has invalid value [{}]. Default value used.", str);
+      }
+    } // UDP logging level
+
+    // Logging: udp-pattern
+    if (j["logging"].contains("udp-pattern")) {
+      try {
+        m_udpLogPattern = j["logging"]["udp-pattern"].get<std::string>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'udp-pattern' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'udp-pattern' due to unknown error.");
+      }
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: LOGGING 'udp-pattern' set to {}.", m_udpLogPattern);
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-pattern' Defaults will be used.");
+      }
+    }
+
+    // Logging: udp-host
+    if (j["logging"].contains("udp-host")) {
+      try {
+        m_udpLogHost = j["logging"]["udp-host"].get<std::string>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'udp-host' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'udp-host' due to unknown error.");
+      }
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: LOGGING 'udp-host' set to {}.", m_udpLogHost);
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-host' Defaults will be used.");
+      }
+    }
+
+    // Logging: udp-port
+    if (j["logging"].contains("udp-port")) {
+      try {
+        m_udpLogPort = j["logging"]["udp-port"].get<uint16_t>();
+      }
+      catch (const std::exception &ex) {
+        spdlog::error("Failed to read 'udp-port' Error='{}'", ex.what());
+      }
+      catch (...) {
+        spdlog::error("Failed to read 'udp-port' due to unknown error.");
+      }
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: LOGGING 'udp-port' set to {}.", m_udpLogPort);
+      }
+    }
+    else {
+      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
+        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-port' Defaults will be used.");
+      }
+    }
+
+  } // logging
 
   // ********************************************************************************
   //                                     Main MQTT

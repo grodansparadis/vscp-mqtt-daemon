@@ -274,7 +274,7 @@ main(int argc, char **argv)
   auto console = spdlog::stdout_color_mt("console");
   // Start out with level=info. Config may change this
   console->set_level(spdlog::level::trace);
-  console->set_pattern("[vscp: %c] [%^%l%$] %v");
+  console->set_pattern("[mqttvscpd: %c] [%^%l%$] %v");
   spdlog::set_default_logger(console);
 
   // Ignore return value from defunct processes id

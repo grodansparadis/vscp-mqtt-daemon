@@ -205,7 +205,6 @@ public:
   std::string getTokenFromTypeId(uint16_t cid, uint16_t tid) { return m_map_type_id2Token[((cid << 16) + tid)]; }
 
 public:
-
   // Will quit if set to true
   bool m_bQuit;
 
@@ -299,6 +298,16 @@ public:
   spdlog::level::level_enum m_consoleLogLevel;
   std::string m_consoleLogPattern;
 
+  bool m_bEnableSysLog;
+  spdlog::level::level_enum m_sysLogLevel;
+  std::string m_sysLogIdent;
+
+  bool m_bEnableUdpLog;
+  spdlog::level::level_enum m_udpLogLevel;
+  std::string m_udpLogPattern;
+  std::string m_udpLogHost;
+  uint16_t m_udpLogPort;
+
   //**************************************************************************
   //                                  MQTT
   //**************************************************************************
@@ -313,21 +322,21 @@ public:
   /*!
    Base topic for VSCP daemon info. Should end with slash
  */
-  std::string m_topicDaemonBase; 
+  std::string m_topicDaemonBase;
 
   /*!
     Topic under daemon base which the dameon publish it's drivers
     Default is 'daemon-base'/drivers
   */
-  std::string m_topicDrivers; 
+  std::string m_topicDrivers;
   /*!
     Topic under daemon base on which the dameon publish it's new node discoveries
     Default is 'daemon-base'/discovery
   */
-  std::string m_topicDiscovery;  
+  std::string m_topicDiscovery;
 
 private:
-  //struct mosquitto *m_mosq; // Handel for MQTT connection
+  // struct mosquitto *m_mosq; // Handel for MQTT connection
 };
 
 #endif // !defined(CONTROLOBJECT_H__7D80016B_5EFD_40D5_94E3_6FD9C324CC7B__INCLUDED_)

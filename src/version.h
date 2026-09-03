@@ -2,14 +2,14 @@
 #define MQTTVSCPD_VERSION_H
 
 #define MQTTVSCPD_VERSION_MAJOR 26
-#define MQTTVSCPD_VERSION_MINOR 08
-#define MQTTVSCPD_VERSION_PATCH 0
+#define MQTTVSCPD_VERSION_MINOR 09
+#define MQTTVSCPD_VERSION_PATCH 47
 
-#define MQTTVSCPD_VERSION_STRING "26.08.0"
-#define MQTTVSCPD_DISPLAY_VERSION "26.08.0"
+#define MQTTVSCPD_VERSION_STRING "26.09.47"
+#define MQTTVSCPD_DISPLAY_VERSION "26.09.47"
 
 #define MQTTVSCPD_COPYRIGHT \
-	"Copyright (C) 2000-2026 Ake Hedman,  contributors,, the VSCP project, " \
+	"Copyright (C) 2000-2026 Ake Hedman, contributors, the VSCP project, " \
 	"https://www.vscp.org"
 
 #endif // MQTTVSCPD_VERSION_H
