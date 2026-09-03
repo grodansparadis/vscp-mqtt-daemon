@@ -81,9 +81,13 @@ target_link_libraries(mqttvscpd
         vscp_sqlite3)
 
 if(WIN32)
-    find_package(pthread REQUIRED)
+    find_package(Threads REQUIRED)
     if(TARGET PThreads4W::PThreads4W_CXXEXC)
         target_link_libraries(mqttvscpd PRIVATE PThreads4W::PThreads4W_CXXEXC)
+    elseif(TARGET PThreads4W::PThreads4W)
+        target_link_libraries(mqttvscpd PRIVATE PThreads4W::PThreads4W)
+    elseif(TARGET Threads::Threads)
+        target_link_libraries(mqttvscpd PRIVATE Threads::Threads)
     endif()
 
     target_link_libraries(mqttvscpd PRIVATE netapi32)
