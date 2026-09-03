@@ -31,7 +31,26 @@ jobs:
           gh-code-scanning-compat: true
           max-allowed-issues: 2147483647
 
+      - name: Normalize SARIF categories for Code Scanning upload
+        run: |
+          jq '
+            .runs |= to_entries
+            | .runs |= map(
+                .value.automationDetails = (
+                  (.value.automationDetails // {})
+                  + {
+                    id: (
+                      ((.value.automationDetails.id // .value.tool.driver.name // "codacy") | tostring)
+                      + "-"
+                      + ((.key + 1) | tostring)
+                    )
+                  }
+                )
+                | .value
+              )
+          ' results.sarif > results-normalized.sarif
+
       - name: Upload SARIF results to GitHub code scanning
         uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
-          sarif_file: results.sarif
+          sarif_file: results-normalized.sarif
