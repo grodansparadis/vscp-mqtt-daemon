@@ -67,6 +67,28 @@ Default generators are:
 - macOS: `TGZ`
 - Windows: `ZIP` and `NSIS` when `makensis` is available
 
+### Raspberry Pi
+
+Raspberry Pi OS (or old Rasspian) can be 64-bit or 32-bit. We supply a binary for both as arm64 and armhf
+
+ARMHF stands for "ARM hard float", and is the name given to a Debian port for ARM processors (armv7+) that have hardware floating point support, which is found on most modern 32-bit ARM boards. ARM64 (also known as AArch64) is the 64-bit extension of the ARM architecture. Raspberry Pi unveiled the beta of its 64-bit version of its Debian-based OS alongside its then new 8GB Raspberry Pi 4 in mid-2020, and is now gradually becoming more commonplace.
+
+In short, ARMHF is 32-bit, and ARM64 is 64-bit. You'll need to install the right version for your Raspberry Pi OS (formerly Raspbian).
+ 
+
+>How do you know whether you're using the 32-bit or 64-bit version of Raspberry Pi OS or Raspbian?
+
+If you have a Raspberry Pi 4, then you may have installed the 64-bit version of Raspberry Pi OS.
+
+However, rather than guessing, there are a few commands you can run to find this out:
+
+```bash
+    sudo apt install lshw
+    sudo lshw | head -6
+``
+
+The value of width indicates 32 or 64 (meaning 32-bit and 64-bit respectively).
+
 ## Versioning
 
 Versioning is **year.month.patch** where year is last two digits of the release year and month is the two digits of the release month (01-12) and patch is a push counter that is updated on each push to the repositories main branch.
