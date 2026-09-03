@@ -13,9 +13,22 @@
           "-s",
           "-c/home/akhe/development/VSCP/vscp-mqtt-daemon/debug/linux/mqttvscpd.json"
         ],
+        "environment": [
+          {
+            "name": "VSCP_ENABLE_UDP_DEBUG",
+            "value": "1"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_IP",
+            "value": "192.168.1.9"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_PORT",
+            "value": "9999"
+          }
+        ],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
-        "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
         "setupCommands": [
@@ -37,9 +50,22 @@
           "-s",
           "-c/etc/vscp/mqttvscpd.json"
         ],
+        "environment": [
+          {
+            "name": "VSCP_ENABLE_UDP_DEBUG",
+            "value": "1"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_IP",
+            "value": "192.168.1.9"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_PORT",
+            "value": "9999"
+          }
+        ],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
-        "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
         "setupCommands": [
@@ -61,9 +87,22 @@
           "-s",
           "-c/home/akhe/development/VSCP/vscp-mqtt-daemonl2drv-automation/debug/linux/mqttvscpd.json"
         ],
+        "environment": [
+          {
+            "name": "VSCP_ENABLE_UDP_DEBUG",
+            "value": "1"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_IP",
+            "value": "192.168.1.9"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_PORT",
+            "value": "9999"
+          }
+        ],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
-        "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
         "setupCommands": [
@@ -85,9 +124,22 @@
           "-s",
           "-c /home/akhe/development/VSCP/vscp-mqtt-daemonl2drv-tcpiplink/debug/linux/mqttvscpd.json"
         ],
+        "environment": [
+          {
+            "name": "VSCP_ENABLE_UDP_DEBUG",
+            "value": "1"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_IP",
+            "value": "192.168.1.9"
+          },
+          {
+            "name": "VSCP_UDP_DEBUG_PORT",
+            "value": "9999"
+          }
+        ],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
-        "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
         "setupCommands": [
@@ -108,7 +160,6 @@
         "args": [],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
-        "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
         "setupCommands": [

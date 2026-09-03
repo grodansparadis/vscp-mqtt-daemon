@@ -78,7 +78,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-//#define DEBUG
+// #define DEBUG
 
 // Globals for the daemon
 int gbStopDaemon;
@@ -143,171 +143,68 @@ _sighandlerRestart(int sig)
   gbStopDaemon   = false;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// The one and only app. object
-//
-
-int
-main(int argc, char **argv)
+#ifndef WIN32
+static bool
+daemonize(pid_t *sid)
 {
-  int opt = 0;
-  std::string rootFolder; // Folder where VSCP files & folders will be located
-  std::string strcfgfile; // Points to XML configuration file
+  pid_t pid;
 
-  // Init pool
-  spdlog::init_thread_pool(8192, 1);
-
-  // Flush log every five seconds
-  spdlog::flush_every(std::chrono::seconds(5));
-
-  auto console = spdlog::stdout_color_mt("console");
-  // Start out with level=info. Config may change this
-  console->set_level(spdlog::level::trace);
-  console->set_pattern("[vscp: %c] [%^%l%$] %v");
-  spdlog::set_default_logger(console);
-
-  // Ignore return value from defunct processes id
-#ifndef WIN32
-  signal(SIGCHLD, SIG_IGN);
-#endif
-  crcInit();
-
-#ifdef WIN32
-  rootFolder   = VSCPD_DEFAULT_ROOT_FOLDER;
-  strcfgfile   = VSCPD_DEFAULT_CONFIG_FILE;
-#else
-  rootFolder   = VSCPD_DEFAULT_ROOT_FOLDER;
-  strcfgfile   = VSCPD_DEFAULT_CONFIG_FILE;
-#endif  
-  gbStopDaemon = false;
-
-  while ((opt = getopt(argc, argv, "d:c:r:k:hgsv")) != -1) {
-
-    switch (opt) {
-
-      case 's':
-        gbDontRunAsDaemon = true;
-        console->info("I will ***NOT*** run as a daemon! (use ctrl+c to terminate)");
-        break;
-
-      case 'c':
-        strcfgfile = optarg;
-        break;
-
-        case 'd':
-        {
-          std::string debugFlags = optarg;
-          if (debugFlags.size() > 2 && debugFlags[0] == '0' && (debugFlags[1] == 'b' || debugFlags[1] == 'B')) {
-            gDebugLevel = std::stoull(debugFlags.substr(2), nullptr, 2);
-          }
-          else {
-            gDebugLevel = std::stoull(debugFlags);
-          }
-        }
-        console->info("Debug flags=%s\n", optarg);
-        break;
-
-      case 'r':
-        rootFolder = optarg;
-        console->info("Will use rootfolder = %s", rootFolder.c_str());
-        break;
-
-      case 'k':
-        // Set system key
-        vscp_hexStr2ByteArray(__vscp_key, 32, optarg);
-        break;
-
-      case 'g':
-        copyleft();
-        exit(0);
-        break;
-        
-      case 'v':
-        fprintf(stderr, "%s\n", MQTTVSCPD_DISPLAY_VERSION);
-        exit(0);
-        break;
-
-      default:
-      case 'h':
-        help(argv[0]);
-        exit(-1);
+  if (gbDontRunAsDaemon) {
+    if (sid != NULL) {
+      *sid = 0;
     }
+    return true;
   }
 
-  console->info("Starting the VSCP daemon...");
+  if (0 > (pid = fork())) {
+    return false;
+  }
+  else if (0 != pid) {
+    exit(0);
+  }
 
-  // * * * init * * *
+  if (sid == NULL) {
+    return false;
+  }
 
-  console->info("Configfile = {}", strcfgfile);
-#ifndef WIN32
-  pid_t pid, sid;
-#endif // WIN32
+  *sid = setsid();
+  if (*sid < 0) {
+    return false;
+  }
 
-#ifndef WIN32
-  if (!gbDontRunAsDaemon) {
+  umask(077);
 
-    // Fork child
-    if (0 > (pid = fork())) {
-      // Failure
-      console->error("Failed to fork.");
-      return -1;
-    }
-    else if (0 != pid) {
-      exit(0); // Parent goes by by.
-    }
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
 
-    sid = setsid(); // Become session leader
-    if (sid < 0) {
-      // Failure
-      console->error("Failed to become session leader.");
-      return -1;
-    }
+  int devNull = open("/dev/null", O_RDWR);
+  if (devNull >= 0) {
+    dup2(devNull, STDIN_FILENO);
+    dup2(devNull, STDOUT_FILENO);
+    dup2(devNull, STDERR_FILENO);
+    close(devNull);
+  }
 
-    umask(0); // Clear out file mode creation mask
+  return true;
+}
 
-    // Close out the standard file descriptors
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-
-    if (open("/", 0)) {
-      console->warn("Open / not 0: %m.");
-    }
-
-    dup2(0, 1);
-    dup2(0, 2);
-
-  }    // !gbDontRunAsDaemon
-#endif // WIN32
-
-#ifndef WIN32
-  // Write pid to file
-  FILE *pFile;
-  pFile = fopen("/var/run/vscpd.pid", "w");
+static bool
+writePidFile(const char *path, pid_t sid)
+{
+  FILE *pFile = fopen(path, "w");
   if (NULL == pFile) {
-    console->warn("Writing pid file failed (access rights?).");
-  }
-  else {
-    console->debug("Writing pid file [/var/run/vscpd.pid] sid=%u\n", sid);
-    fprintf(pFile, "%u\n", sid);
-    fclose(pFile);
-  }
-#endif // WIN32
-
-#ifndef WIN32
-  // Change working directory to VSCP root folder
-  if (chdir((const char *) rootFolder.c_str())) {
-    console->warn("Failed to change dir to rootdir.");
-    if (-1 == chdir("/var/lib/vscp/mqttvscpd")) {
-      console->warn("Unable to chdir to home folder [/var/lib/vscp/mqttvscpd] errno=%d", errno);
-    }
-
-    unlink("/var/run/vscpd.pid");
-    // spdlog::drop_all();
-    // spdlog::shutdown();
-    // exit(EXIT_FAILURE);
+    return false;
   }
 
+  fprintf(pFile, "%u\n", static_cast<unsigned int>(sid));
+  fclose(pFile);
+  return true;
+}
+
+static void
+setupSignalHandlers()
+{
   struct sigaction my_action;
 
   // Ignore SIGPIPE
@@ -339,6 +236,140 @@ main(int argc, char **argv)
   my_action.sa_handler = _sighandlerStop;
   my_action.sa_flags   = SA_RESTART;
   sigaction(SIGHUP, &my_action, NULL);
+}
+#endif // !WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+// The one and only app. object
+//
+
+int
+main(int argc, char **argv)
+{
+  int opt = 0;
+  std::string rootFolder; // Folder where VSCP files & folders will be located
+  std::string strcfgfile; // Points to XML configuration file
+  pid_t sid = 0;
+
+  char *value = getenv("VSCP_ENABLE_UDP_DEBUG");
+  if (value != NULL) {
+    printf("VSCP_ENABLE_UDP_DEBUG = %s\n", value);
+  }
+
+  VSCP_UDP_LOG("mqttvscpd starting up...");
+
+  // Init pool
+  spdlog::init_thread_pool(8192, 1);
+
+  // Flush log every five seconds
+  spdlog::flush_every(std::chrono::seconds(5));
+
+  auto console = spdlog::stdout_color_mt("console");
+  // Start out with level=info. Config may change this
+  console->set_level(spdlog::level::trace);
+  console->set_pattern("[vscp: %c] [%^%l%$] %v");
+  spdlog::set_default_logger(console);
+
+  // Ignore return value from defunct processes id
+#ifndef WIN32
+  signal(SIGCHLD, SIG_IGN);
+#endif
+  crcInit();
+
+#ifdef WIN32
+  rootFolder = VSCPD_DEFAULT_ROOT_FOLDER;
+  strcfgfile = VSCPD_DEFAULT_CONFIG_FILE;
+#else
+  rootFolder = VSCPD_DEFAULT_ROOT_FOLDER;
+  strcfgfile = VSCPD_DEFAULT_CONFIG_FILE;
+#endif
+  
+
+  gbStopDaemon = false;
+
+  while ((opt = getopt(argc, argv, "d:c:r:k:hgsv")) != -1) {
+    switch (opt) {
+      case 's':
+        gbDontRunAsDaemon = true;
+        console->info("I will ***NOT*** run as a daemon! (use ctrl+c to terminate)");
+        break;
+
+      case 'c':
+        strcfgfile = optarg;
+        break;
+
+      case 'd': {
+        std::string debugFlags = optarg;
+        if (debugFlags.size() > 2 && debugFlags[0] == '0' && (debugFlags[1] == 'b' || debugFlags[1] == 'B')) {
+          gDebugLevel = std::stoull(debugFlags.substr(2), nullptr, 2);
+        }
+        else {
+          gDebugLevel = std::stoull(debugFlags);
+        }
+        console->info("Debug flags=%s\n", optarg);
+        VSCP_UDP_LOG("Debugflags=%s", optarg);
+        break;
+      }
+
+      case 'r':
+        rootFolder = optarg;
+        console->info("Will use rootfolder = %s", rootFolder.c_str());
+        break;
+
+      case 'k':
+        // Set system key
+        vscp_hexStr2ByteArray(__vscp_key, 32, optarg);
+        break;
+
+      case 'g':
+        copyleft();
+        exit(0);
+        break;
+
+      case 'v':
+        fprintf(stderr, "%s\n", MQTTVSCPD_DISPLAY_VERSION);
+        exit(0);
+        break;
+
+      default:
+      case 'h':
+        help(argv[0]);
+        exit(-1);
+    }
+  }
+
+  console->info("Starting the VSCP daemon...");
+  console->info("Configfile = {}", strcfgfile);
+
+  VSCP_UDP_LOG("Main paths: root=%s cfg=%s", rootFolder.c_str(), strcfgfile.c_str());
+
+#ifndef WIN32
+  if (!daemonize(&sid)) {
+    console->error("Failed to initialize daemon process.");
+    return -1;
+  }
+
+  if (!gbDontRunAsDaemon) {
+    if (!writePidFile("/var/run/vscpd.pid", sid)) {
+      console->warn("Writing pid file failed (access rights?).");
+    }
+    else {
+      console->debug("Writing pid file [/var/run/vscpd.pid] sid=%u\n", static_cast<unsigned int>(sid));
+    }
+  }
+#endif // WIN32
+
+#ifndef WIN32
+  if (chdir((const char *) rootFolder.c_str())) {
+    console->warn("Failed to change dir to rootdir.");
+    if (-1 == chdir("/var/lib/vscp/mqttvscpd")) {
+      console->warn("Unable to chdir to home folder [/var/lib/vscp/mqttvscpd] errno=%d", errno);
+    }
+
+    unlink("/var/run/vscpd.pid");
+  }
+
+  setupSignalHandlers();
 #endif // !WIN32
 
   // Create the control object
@@ -354,8 +385,6 @@ main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  // spdlog::get("console")->info("loggers can be retrieved from a global registry using the spdlog::get(logger_name)");
-
   // Console log
   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
   if (gpobj->m_bEnableConsoleLog) {
@@ -363,14 +392,12 @@ main(int argc, char **argv)
     console_sink->set_pattern(gpobj->m_consoleLogPattern);
   }
   else {
-    // If disabled set to off
     console_sink->set_level(spdlog::level::off);
   }
 
   try {
-    // Make sure the log file directory exists (create it if not)
     std::string logDir = gpobj->m_path_to_log_file;
-    size_t slashPos     = logDir.find_last_of('/');
+    size_t slashPos    = logDir.find_last_of('/');
     if (std::string::npos != slashPos) {
       logDir = logDir.substr(0, slashPos);
       if (logDir.length() && !vscp_fileExists(logDir.c_str())) {
@@ -388,7 +415,6 @@ main(int argc, char **argv)
       rotating_file_sink->set_pattern(gpobj->m_fileLogPattern);
     }
     else {
-      // If disabled set to off
       rotating_file_sink->set_level(spdlog::level::off);
     }
 
@@ -398,7 +424,6 @@ main(int argc, char **argv)
                                                          sinks.end(),
                                                          spdlog::thread_pool(),
                                                          spdlog::async_overflow_policy::block);
-    // The separate sub loggers will handle trace levels
     logger->set_level(spdlog::level::trace);
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
@@ -409,12 +434,6 @@ main(int argc, char **argv)
     spdlog::shutdown();
     exit(EXIT_FAILURE);
   }
-
-  // *******************************
-  //    Main loop is entered here
-  // *******************************
-
-  //         * * * RUN * * *
 
   console->debug("vscpd: run.");
 
@@ -428,8 +447,6 @@ main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  // * * * CLEAN UP * * *
-
   console->debug("vscpd: cleanup.");
 
   if (!gpobj->cleanup()) {
@@ -442,7 +459,6 @@ main(int argc, char **argv)
   console->debug("vscpd: Deleting the control object.");
   delete gpobj;
 
-  // Remove the pid file
 #ifndef WIN32
   unlink("/var/run/vscp/vscpd.pid");
 #endif
@@ -452,6 +468,8 @@ main(int argc, char **argv)
 
   spdlog::drop_all();
   spdlog::shutdown();
+
+  VSCP_UDP_LOG("mqttvscpd quiting");
 
   exit(EXIT_SUCCESS);
 }
