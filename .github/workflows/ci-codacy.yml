@@ -35,6 +35,7 @@ jobs:
         run: |
           jq '
             .runs |= to_entries
+            | .runs |= sort_by(.key)
             | .runs |= map(
                 .value.automationDetails = (
                   (.value.automationDetails // {})
@@ -48,7 +49,6 @@ jobs:
                 )
                 | .value
               )
-            | .runs |= sort_by(.automationDetails.id // .tool.driver.name // "codacy")
             # GitHub code scanning rejects SARIF uploads with more than 20 runs.
             | .runs |= .[:20]
           ' results.sarif > results-normalized.sarif
