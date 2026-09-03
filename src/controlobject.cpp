@@ -36,6 +36,7 @@
 #include <pch.h>
 #endif
 
+#include "debug-flags.h"
 #include "controlobject.h"
 
 #ifndef WIN32
@@ -87,7 +88,6 @@
 #include <version.h>
 #include <vscp.h>
 #include <vscp-client-mqtt.h>
-#include <vscp-debug.h>
 #include <vscpd-caps.h>
 #include <vscphelper.h>
 

@@ -5,6 +5,7 @@
       "includePath": [
         "${workspaceFolder}/src",
         "${workspaceFolder}/third-party/json/include",
+        "${workspaceFolder}/third-party/vscp/src/common",
         "${workspaceFolder}/third-party/vscp/src/vscp/common",
         "${workspaceFolder}/third-party/vscp/third-party/sqlite3",
         "${workspaceFolder}/third-party/vscp/third_party/maddy/include",
