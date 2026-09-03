@@ -236,17 +236,6 @@ public:
   */
   bool bEventOutLookup;
 
-  //**************************************************************************
-  //                                  DEBUG
-  //**************************************************************************
-
-  /*!
-   * Debug flags
-   * See vscp_debug.h for possible flags.
-   */
-  // uint64_t m_debugFlags;
-
-  // Debug output is always enabled in the daemon build.
 
   //**************************************************************************
   //                                DATABASE
@@ -334,6 +323,7 @@ public:
     Default is 'daemon-base'/discovery
   */
   std::string m_topicDiscovery;
+
 
 private:
   // struct mosquitto *m_mosq; // Handel for MQTT connection

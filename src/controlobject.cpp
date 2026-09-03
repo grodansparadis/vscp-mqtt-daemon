@@ -694,7 +694,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       }
 
       // Add local host to in memory map
-      m_map_discoveryGuidToName[m_guid.getAsString()] = "local-vscp-daemon";
+      m_map_discoveryGuidToName[m_guid.getAsString()] = m_strServerName;
     }
   }
 
@@ -787,6 +787,7 @@ CControlObject::init_mqtt()
     }
   }
 
+  // Publish server version
   {
     mustache subtemplate{ m_topicDaemonBase + "server-version" };
     data data;
@@ -806,7 +807,7 @@ CControlObject::init_mqtt()
     }
   }
 
-  // Start server date/time
+  // Publish server start date/time
   {
     mustache subtemplate{ m_topicDaemonBase + "server-started-utc" };
     data data;
@@ -828,7 +829,7 @@ CControlObject::init_mqtt()
     }
   }
 
-  // Publish drivers
+  // Publish loaded drivers
   {
     mustache subtemplate{ m_topicDrivers };
     data data;
@@ -850,8 +851,30 @@ CControlObject::init_mqtt()
     }
   }
 
+  // publish index (name to GUID)
+  {
+    mustache subtemplate{ "{{srvguid}}" };
+    data data;
+    data.set("guid", m_guid.getAsString());
+    data.set("srvguid", m_guid.getAsString());
+    data.set("ifguid", m_guid.getAsString());
+    std::string strPayload = subtemplate.render(data);
+    std::string strTopic   = "vscp-daemon/index/" + m_strServerName;
+    if (MOSQ_ERR_SUCCESS != (rv = mosquitto_publish(m_mqttClient.getMqttHandle(),
+                                                    NULL,
+                                                    strTopic.c_str(),
+                                                    (int) strPayload.length(),
+                                                    strPayload.c_str(),
+                                                    2,
+                                                    true))) {
+      spdlog::error("Failed to publish VSCP daemon name<->guid index. error={0} {1}", rv, mosquitto_strerror(rv));
+    }
+  }
+
   return true;
 }
+
+// ----------------------------------------------------------------------------
 
 #ifdef WIN32
 

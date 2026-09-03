@@ -229,7 +229,7 @@ __Only on Unix/Linux__. User to run the VSCP daemon as. This is for security and
 Change to the user you want or set to empty to run as the user who starts the VSCP daemon.
 
 
-### guid :id=config-gerneral-guid
+### guid :id=config-general-guid
 
 ```xml
 <guid>
@@ -251,6 +251,8 @@ If not set here (or all nills) a GUID will be formed from the (first) MAC addres
 If set this real text name will be used as an identifier for the server along with the GUID. The default name will be something like
 
     The VSCP Daemon
+
+but you should set this to an id that make it easy to identify your server as it will be published to the MQTT server you setup at the topic mqttvscp-daemon/{{guid}} where {{guid}} is [the guid you used for the daemon](#config-general-guid).
 
 ### classtypedb :id=config-general-classtypedb
 This is a path to a sqlite3 database file that holds information about VSCP events and can give symbolic output from the VSCP daemon. You can for instance have topics that display class or type as token instead of the numerical code. Live this entry blank if you have no interest in this.
