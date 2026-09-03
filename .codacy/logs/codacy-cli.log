@@ -1,3 +1,5 @@
 2026-09-02T16:57:30+02:00 [INFO] (codacy-cli-v2/cli-v2.go:27) Starting Codacy CLI version=1.0.0-main.380.sha.27e119a (27e119a) built at 2026-06-11T09:54:47Z
 2026-09-02T16:57:30+02:00 [INFO] (codacy-cli-v2/cmd/root.go:34) Executing CLI command command=init full_command=[/home/akhe/.cache/codacy/codacy-cli-v2/1.0.0-main.380.sha.27e119a/codacy-cli-v2 init --provider gh --organization kainjow --repository Mustache --api-token ***] args=[]
 2026/09/02 16:57:30 failed to get repository tools: request to https://app.codacy.com/api/v3/analysis/organizations/gh/kainjow/repositories/Mustache/tools failed with status 404
+2026-09-03T17:12:46+02:00 [INFO] (codacy-cli-v2/cli-v2.go:27) Starting Codacy CLI version=1.0.0-main.380.sha.27e119a (27e119a) built at 2026-06-11T09:54:47Z
+2026-09-03T17:12:46+02:00 [INFO] (codacy-cli-v2/cli-v2.go:55) No configuration file was found, execute init command first.

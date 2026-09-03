@@ -142,129 +142,130 @@ extern uint8_t __vscp_key[32]; // (256 bits / 32 bytes)
 // mqtt_log_callback
 //
 
-// static void
-// {
-//   // Check pointers
-//   if (nullptr == mosq) {
-//     return;
-//   }
-//   if (nullptr == pData) {
-//     return;
-//   }
+static void
+mqtt_log_callback(struct mosquitto *mosq, void *pData, int level, const char *logmsg)
+{
+  // Check pointers
+  if (nullptr == mosq) {
+    return;
+  }
+  if (nullptr == pData) {
+    return;
+  }
 
-//   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
+  CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   {
-//     char buf[80];
-//     time_t tm;
-//     time(&tm);
-//     vscp_getTimeString(buf, sizeof(buf), &tm);
+  {
+    char buf[80];
+    time_t tm;
+    time(&tm);
+    vscp_getTimeString(buf, sizeof(buf), &tm);
 
-//     if (spdlog::get("logger") != nullptr) {
-//       spdlog::trace("MQTT log: {}", logmsg);
-//     }
-//   }
-// }
+    if (spdlog::get("logger") != nullptr) {
+      spdlog::trace("MQTT log: {}", logmsg);
+    }
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // mqtt_on_connect
 //
 
-// static void
-// mqtt_on_connect(struct mosquitto *mosq, void *pData, int rv)
-// {
-//   // Check pointers
-//   if (nullptr == mosq) {
-//     return;
-//   }
-//   if (nullptr == pData) {
-//     return;
-//   }
+static void
+mqtt_on_connect(struct mosquitto *mosq, void *pData, int rv)
+{
+  // Check pointers
+  if (nullptr == mosq) {
+    return;
+  }
+  if (nullptr == pData) {
+    return;
+  }
 
-//   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
+  CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   {
-//     if (spdlog::get("logger") != nullptr) {
-//       spdlog::debug("MQTT connect:");
-//     }
-//   }
-// }
+  {
+    if (spdlog::get("logger") != nullptr) {
+      spdlog::debug("MQTT connect:");
+    }
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // mqtt_on_disconnect
 //
 
-// static void
-// mqtt_on_disconnect(struct mosquitto *mosq, void *pData, int rv)
-// {
-//   // Check pointers
-//   if (nullptr == mosq) {
-//     return;
-//   }
-//   if (nullptr == pData) {
-//     return;
-//   }
+static void
+mqtt_on_disconnect(struct mosquitto *mosq, void *pData, int rv)
+{
+  // Check pointers
+  if (nullptr == mosq) {
+    return;
+  }
+  if (nullptr == pData) {
+    return;
+  }
 
-//   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
+  CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   {
-//     if (spdlog::get("logger") != nullptr) {
-//       spdlog::debug("MQTT disconnect:");
-//     }
-//   }
-// }
+  {
+    if (spdlog::get("logger") != nullptr) {
+      spdlog::debug("MQTT disconnect:");
+    }
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // mqtt_on_message
 //
 
-// static void
-// mqtt_on_message(struct mosquitto *mosq, void *pData, const struct mosquitto_message *pMsg)
-// {
-//   // Check pointers
-//   if (nullptr == mosq) {
-//     return;
-//   }
-//   if (nullptr == pData) {
-//     return;
-//   }
-//   if (nullptr == pMsg) {
-//     return;
-//   }
+static void
+mqtt_on_message(struct mosquitto *mosq, void *pData, const struct mosquitto_message *pMsg)
+{
+  // Check pointers
+  if (nullptr == mosq) {
+    return;
+  }
+  if (nullptr == pData) {
+    return;
+  }
+  if (nullptr == pMsg) {
+    return;
+  }
 
-//   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
-//   std::string payload((const char *) pMsg->payload, pMsg->payloadlen); // String payload
+  CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
+  std::string payload((const char *) pMsg->payload, pMsg->payloadlen); // String payload
 
-//   {
-//     if (spdlog::get("logger") != nullptr) {
-//       spdlog::trace("MQTT Message: Topic = [{}] - Payload: [{}]", pMsg->topic, payload);
-//     }
-//   }
-// }
+  {
+    if (spdlog::get("logger") != nullptr) {
+      spdlog::trace("MQTT Message: Topic = [{}] - Payload: [{}]", pMsg->topic, payload);
+    }
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // mqtt_on_publish
 //
 
-// static void
-// mqtt_on_publish(struct mosquitto *mosq, void *pData, int rv)
-// {
-//   // Check pointers
-//   if (nullptr == mosq) {
-//     return;
-//   }
-//   if (nullptr == pData) {
-//     return;
-//   }
+static void
+mqtt_on_publish(struct mosquitto *mosq, void *pData, int mid)
+{
+  // Check pointers
+  if (nullptr == mosq) {
+    return;
+  }
+  if (nullptr == pData) {
+    return;
+  }
 
-//   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
+  CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   {
-//     if (spdlog::get("logger") != nullptr) {
-//       spdlog::trace("MQTT Publish:");
-//     }
-//   }
-// }
+  {
+    if (spdlog::get("logger") != nullptr) {
+      spdlog::trace("MQTT Publish: message id = {}", mid);
+    }
+  }
+}
 
 // ----------------------------------------------------------------------------
 
