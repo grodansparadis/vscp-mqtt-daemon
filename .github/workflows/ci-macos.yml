@@ -1,0 +1,62 @@
+name: CI macOS
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  VSCPD_BUILD_NUMBER: ${{ github.run_number }}
+
+jobs:
+  build:
+    name: macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set build version
+        shell: bash
+        run: bash scripts/update-version.sh
+
+      - name: Install dependencies
+        run: |
+          brew install cjson expat mosquitto openssl pandoc
+          echo "BREW_PREFIXES=$(brew --prefix openssl);$(brew --prefix expat);$(brew --prefix mosquitto);$(brew --prefix curl);$(brew --prefix cjson)" >> "$GITHUB_ENV"
+
+      - name: Configure
+        shell: bash
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH=${BREW_PREFIXES}
+          -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
+          -DVSCPD_PACKAGE_GENERATORS=TGZ\;ZIP
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package
+        run: cpack --config build/CPackConfig.cmake -C Release
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: vscpd-macOS
+          if-no-files-found: error
+          path: |
+            *.tar.gz
+            *.tgz
+            *.zip
+            build/*.tar.gz
+            build/*.tgz
+            build/*.zip

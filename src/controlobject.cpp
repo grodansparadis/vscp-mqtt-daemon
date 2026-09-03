@@ -36,7 +36,6 @@
 #include <pch.h>
 #endif
 
-#include "debug-flags.h"
 #include "controlobject.h"
 
 #ifndef WIN32
@@ -472,12 +471,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
   }
 
   spdlog::debug("Logging initialized. Log file: {}", m_path_to_log_file);
-
   spdlog::info("Starting mqttvscpd daemon, version {} ({})", MQTTVSCPD_DISPLAY_VERSION, MQTTVSCPD_COPYRIGHT);
-  spdlog::debug("debug message - file only (console filters warn+, udp filters info+)");
-  spdlog::warn("warn message");
-  spdlog::error("error message");
-  spdlog::info("info message");
 
 #ifndef WIN32
   if (m_runAsUser.length()) {

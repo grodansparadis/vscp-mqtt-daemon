@@ -47,11 +47,11 @@
     "bretain": false,
     "keepalive": 60,
     "bjsonmeasurementblock": true,
-    "topic-daemon-base": "vscp-daemon/status/{{guid}}/",
+    "topic-daemon-base": "vscp-daemon/{{guid}}/",
     "topic-drivers": "drivers",
     "topic-discovery": "discovery",
     "will": {
-      "topic": "vscp-daemon/status/{{srvguid}}/will",
+      "topic": "vscp-daemon/{{srvguid}}/will",
       "qos": 1,
       "retain": true,
       "payload": "VSCP Daemon is down"

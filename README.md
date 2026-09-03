@@ -1,12 +1,16 @@
 # vscp-mqtt-daemon
 
-There are currently two daemons (servers) for the VSCP protocol. The VSCP MQTT daemon (mqtt-vscpd) and the [VSCP tcp/ip daemon (tcpip-vscpd)](https://github.com/grodansparadis/vscp-tcpip-daemon). 
+[![CI](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci.yml)
 
-The **mqtt-vscpd** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers.
+![](./docs/images/vscp_arcitecture.png)
 
-The **tcpip-vscpd** daemon export the VSCP tcp/ip link protocol and can just as the mqtt-vscpd connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface.
+There are currently two daemons (servers) for the VSCP protocol. The VSCP MQTT daemon (**vscp-mqtt-daemon**) and the [VSCP tcp/ip daemon (vscp-tcpip-daemon)](https://github.com/grodansparadis/vscp-tcpip-daemon). 
 
-This repository is for the mqtt-vscpd.  Got the repository for the [tcpip-vscpd](https://github.com/grodansparadis/vscp-tcpip-daemon) for information about the tcpip-vscpd
+The **vscp-mqtt-daemon** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers. It support all level I and level II drivers.
+
+The **vscp-tcpip-daemon** export the VSCP tcp/ip link protocol and can just as the __vscp-mqtt-daemon__ connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface. It support all level I and level II drivers.
+
+This repository is for the __vscp-mqtt-daemon__.  The vscp-mqtt-daemon is available for Linux, Windows and Macintosh. Binaries is available for all platforms including Raspberrey Pi.
 
 ## Build
 
@@ -17,7 +21,7 @@ The daemon now builds from this repository root and links against the vendored V
 ### Linux
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release|debug
 cmake --build build --parallel
 ```
 
@@ -60,3 +64,15 @@ Default generators are:
 ## CI
 
 GitHub Actions builds and packages the daemon on Linux, macOS, and Windows from `.github/workflows/ci.yml`.
+
+## License
+
+The whole source code is published under the MIT license. Consider the different licenses of possible third party libraries too!
+
+## Contribution
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, shall be licensed as above, without any additional terms or conditions.
+
+-----
+Copyright (C) 2000-2026 Åke Hedman and contributors, the VSCP project - MIT license.
+
+

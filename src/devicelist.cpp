@@ -34,7 +34,6 @@
 #include <unistd.h>
 #endif
 
-#include "debug-flags.h"
 #include "devicelist.h"
 
 #include <errno.h>

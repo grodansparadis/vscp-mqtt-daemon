@@ -108,31 +108,31 @@
         },
         "publish": [
             {
-                "topic" : "publish/topic/json",
+                "topic" : "fluorine-test-publish/topic/json",
                 "qos" : 0,
                 "retain" : false,
                 "format": "json"
             },
             {
-                "topic" : "publish/topic/xml",
+                "topic" : "fluorine-test-publish/topic/xml",
                 "qos" : 0,
                 "retain" : false,
                 "format": "xml"
             },
             {
-                "topic" : "publish/topic/string",
+                "topic" : "fluorine-test-publish/topic/string",
                 "qos" : 0,
                 "retain" : false,
                 "format": "string"
             },
             {
-                "topic" : "publish/topic/binary",
+                "topic" : "fluorine-test-publish/topic/binary",
                 "qos" : 0,
                 "retain" : false,
                 "format": "binary"
             },
             {
-                "topic" : "publish/topic/{{datetime}}/{{user}}/C",
+                "topic" : "fluorine-test-publish/topic/{{datetime}}/{{user}}/C",
                 "qos" : 0,
                 "retain" : false,
                 "format": "json"

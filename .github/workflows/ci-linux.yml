@@ -1,0 +1,87 @@
+name: CI Linux
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  VSCPD_BUILD_NUMBER: ${{ github.run_number }}
+
+jobs:
+  build:
+    name: Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set build version
+        shell: bash
+        run: bash scripts/update-version.sh
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            curl \
+            libcurl4-openssl-dev \
+            libexpat1-dev \
+            libmosquitto-dev \
+            libssl-dev \
+            libsystemd-dev \
+            mosquitto \
+            pandoc \
+            pkg-config \
+            rpm
+
+      - name: Configure
+        shell: bash
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
+          -DVSCPD_PACKAGE_GENERATORS=TGZ\;DEB\;RPM\;ZIP
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package
+        run: cpack --config build/CPackConfig.cmake -C Release
+        working-directory: ${{ github.workspace }}
+
+      - name: Validate Debian package
+        shell: bash
+        run: |
+          set -euo pipefail
+          deb_file=$(find . -type f -name 'mqttvscpd_*.deb' -print -quit)
+          if [ -z "$deb_file" ]; then
+            echo "No Debian package produced" >&2
+            exit 1
+          fi
+          bash resources/debpkg/validate-package.sh "$deb_file"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: vscpd-Linux
+          if-no-files-found: error
+          path: |
+            *.deb
+            *.rpm
+            *.tar.gz
+            *.tgz
+            *.zip
+            build/*.deb
+            build/*.tar.gz
+            build/*.tgz
+            build/*.zip
