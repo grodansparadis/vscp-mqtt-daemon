@@ -145,21 +145,29 @@ In the general section you find settings that are common to all components of th
 "debug" : 0,	
 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
 "servername" : "The VSCP daemon on HOST",
-"classtypedb" : "/var/lib/vscp/vscpd/vscp_events.sqlite3",
-"maindb" : "/var/lib/vscp/vscpd/vscp.sqlite3",
-"discoverydb" : "/var/lib/vscp/vscpd/vscp.sqlite3",
+"classtypedb" : "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3",
+"maindb" : "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
+"discoverydb" : "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
 "vscpkey" : "/var/vscp/vscp.key",
 
 "logging" : {
     "file-enable-log": true,
     "file-log-level" : "debug",
-    "file-pattern" : "[vscp %c] [%^%l%$] %v",
-    "file-path" : "/var/log/vscp/vscpd.log",
+    "file-pattern" : "[mqttvscp %c] [%^%l%$] %v",
+    "file-path" : "/var/log/vscp/mqttvscpd.log",
     "file-max-size" : 5242880,
     "file-max-files" : 7,
     "console-enable-log": false,
     "console-log-level" : "info",
-    "console-pattern" : "[vscp %c] [%^%l%$] %v"
+    "console-pattern" : "[mqttvscp %c] [%^%l%$] %v",
+    "syslog-enable-log" : true,
+    "syslog-log-level" : "info",
+    "syslog-ident" : "mqttvscpd",
+    "udp-enable-log": true,
+    "udp-log-level" : "info",
+    "udp-pattern" : "[mqttvscp] [%^%l%$] %v",
+    "udp-host" : "127.0.0.1",
+    "udp-port" : 9999
 },
   "mqtt": {
     "host": "test.mosquitto.org",
@@ -213,16 +221,6 @@ In the general section you find settings that are common to all components of th
 ```
 
 this will start up the daemon but do noting. You need to add a driver to get some work done.
-
-### debug :id=config-gerneral-debug    
-
-The debug entry is a 64-bit number (each bit is a flag)  that enable (if set) a specific debugging capability of the VSCP daemon. If you have problem you should enable the relevant bits to be able to detect the cause for the problem.
-
-The debug bits are defined in [this file](https://github.com/grodansparadis/vscp/blob/master/src/vscp/common/vscp_debug.h).
-
-All flags set is 0xfffffffffffffff whish is 18446744073709551615. A decimal value or a string representing a hexadecimal value can be used to can be set the flags. If a string is used it can but does not have to, be preceded by '0x' or '0X'.
-
-Se the [solving problems](./solving_problems.md) section for more information.
 
 ### runasuser :id=config-general-runasuser
 
@@ -307,10 +305,10 @@ Log file pattern as described [here](https://github.com/gabime/spdlog/wiki/3.-Cu
 Path to log file. Default is on Linux is */var/log/vscp/vscpd.log*
 
 ##### file-max-size :id=config-general-logging-file-max-size
-Max size for log file. It will be rotated if over this size. Default is 5 Mb.
+Max size for log file. It will be rotated if over this size. Default is 10 Mb.
 
 ##### file-max-files :id=config-general-logging-file-max-files
-Maximum number of log files to keep. Default is 7.
+Maximum number of log files to keep. Default is 3.
 
 #### Logging to console
 
@@ -331,7 +329,61 @@ Log level for console log. Default is "info".
 
 ##### console-pattern :id=config-general-logging-console-pattern
 
-Format for consol log.
+Format for consol log. Default is __"[vscp] [%^%l%$] %v"__
+
+
+#### Logging to syslog (Unix and macintosh)
+
+Logging to the standard logging mechanism on Unix like systems.  
+
+##### syslog-enable-log :id=config-general-logging-syslog-enable-log
+Enable logging to a console by setting to *true*.
+
+##### syslog-log-level :id=config-general-logging-syslog-log-level
+Log level for console log. Default is "info".
+
+| Level | Description |
+| ----- | ----------- |
+| "trace" | Everything is logged |
+| "debug" | Everything except trace is logged |
+| "info" | info and above is logged |
+| "err" | Errors and above is logged |
+| "critical" | Only critical messages are logged |
+| "off" | No logging |
+
+##### syslog-ident :id=config-general-logging-syslog-ident
+This set to "mqttvscpd" as default and is the program identifier tag that gets attached to every log line syslog receives from your application — it's how syslog (and anything reading its output) knows which program sent a given message.
+
+#### Logging to UDP
+
+UDP log messages are sent to a specific UDP host address and port.
+
+##### console-enable-log :id=config-general-logging-console-enable-log
+Enable logging to a UDP by setting to *true*.
+
+##### console-log-level :id=config-general-logging-console-log-level
+Log level for UDP log. Default is "info". Note that __"info"___ is probably the maximum level yoy normally want to set not to overload your network.
+
+| Level | Description |
+| ----- | ----------- |
+| "trace" | Everything is logged |
+| "debug" | Everything except trace is logged |
+| "info" | info and above is logged |
+| "err" | Errors and above is logged |
+| "critical" | Only critical messages are logged |
+| "off" | No logging |
+
+##### udp-pattern :id=config-general-logging-udp-pattern
+
+Format for udp log messages. Default is __"[mqttvscp] [%^%l%$] %v"__
+
+##### udp-host :id=config-general-logging-udp-host
+
+UDP host to send log messages to. Should be IP-address Default is "127.0.0.1"
+
+##### udp-port :id=config-general-logging-udp-port
+
+UDP port to send log messages to. Default is 9999
 
 ----
 ##  MQTT :id=config-mqtt

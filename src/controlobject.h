@@ -246,7 +246,7 @@ public:
    */
   // uint64_t m_debugFlags;
 
-  // replaces with gDebugLevel
+  // Debug output is always enabled in the daemon build.
 
   //**************************************************************************
   //                                DATABASE

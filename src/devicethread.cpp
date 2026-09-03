@@ -64,7 +64,6 @@ using namespace kainjow::mustache;
 
 // From vscp.cpp
 extern uint8_t *__vscp_key; // (256 bits)
-extern uint64_t gDebugLevel;
 
 
 
@@ -183,9 +182,7 @@ deviceThread(void *pData)
   if (VSCP_DRIVER_LEVEL1 == pDeviceItem->m_driverLevel) {
 
     // Now find methods in library
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-      spdlog::debug("Loading level I driver: {}", pDeviceItem->m_strName);
-    }
+    spdlog::debug("Loading level I driver: {}", pDeviceItem->m_strName);
 
     // * * * * CANAL OPEN * * * *
     pDeviceItem->m_proc_CanalOpen = (LPFNDLL_CANALOPEN) dlsym(hdll, "CanalOpen");
@@ -369,9 +366,7 @@ deviceThread(void *pData)
       return NULL;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-      spdlog::debug("%s: [Device tread] Level I Driver open.", pDeviceItem->m_strName.c_str());
-    }
+    spdlog::debug("%s: [Device tread] Level I Driver open.", pDeviceItem->m_strName.c_str());
 
     //--------------------------------------------------------------
     //                       MQTT Level I
@@ -425,9 +420,7 @@ deviceThread(void *pData)
 
       // * * * * Blocking version * * * *
 
-      if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-        spdlog::debug("{}: [Device tread] Level I blocking version.", pDeviceItem->m_strName.c_str());
-      }
+      spdlog::debug("{}: [Device tread] Level I blocking version.", pDeviceItem->m_strName.c_str());
 
       /////////////////////////////////////////////////////////////////////////////
       //                      Device write worker thread
@@ -494,17 +487,13 @@ deviceThread(void *pData)
       // Signal worker threads to quit
       pDeviceItem->m_bQuit = true;
 
-      if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-        spdlog::info("{}: [Device tread] Level I work loop ended.", pDeviceItem->m_strName);
-      }
+      spdlog::info("{}: [Device tread] Level I work loop ended.", pDeviceItem->m_strName);
     }
     else {
 
       // * * * * Non blocking version * * * *
 
-      if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-        spdlog::info("{}: [Device tread] Level I NON Blocking version.", pDeviceItem->m_strName);
-      }
+      spdlog::info("{}: [Device tread] Level I NON Blocking version.", pDeviceItem->m_strName);
 
       while (!pDeviceItem->m_bQuit) {
 
@@ -591,16 +580,12 @@ deviceThread(void *pData)
 
     } // if blocking/non blocking
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-      spdlog::info("{}: [Device tread] Level I Work loop ended.", pDeviceItem->m_strName);
-    }
+    spdlog::info("{}: [Device tread] Level I Work loop ended.", pDeviceItem->m_strName);
 
     // Close CANAL channel
     pDeviceItem->m_proc_CanalClose(pDeviceItem->m_openHandle);
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-      spdlog::info("{}: [Device tread] Level I Closed.", pDeviceItem->m_strName);
-    }
+    spdlog::info("{}: [Device tread] Level I Closed.", pDeviceItem->m_strName);
 
     pDeviceItem->m_bQuit = true;
     pDeviceItem->m_mqttClient.disconnect();
@@ -651,9 +636,7 @@ deviceThread(void *pData)
       return NULL;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL2) {
-      spdlog::debug("{}: Discovered all methods\n", pDeviceItem->m_strName);
-    }
+    spdlog::debug("{}: Discovered all methods\n", pDeviceItem->m_strName);
 
     //--------------------------------------------------------------
     //                        MQTT Level II
@@ -710,9 +693,7 @@ deviceThread(void *pData)
       return NULL;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL2) {
-      spdlog::debug("{}: [Device tread] Level II Open.", pDeviceItem->m_strName);
-    }
+    spdlog::debug("{}: [Device tread] Level II Open.", pDeviceItem->m_strName);
 
     // --------------------------------------------------------------------
     //        Work loop L2 - receive from device - send to MQTT broker
@@ -741,16 +722,12 @@ deviceThread(void *pData)
       }
     }
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL2) {
-      spdlog::debug("{}: [Device tread] Level II Closing.", pDeviceItem->m_strName);
-    }
+    spdlog::debug("{}: [Device tread] Level II Closing.", pDeviceItem->m_strName);
 
     // Close channel
     pDeviceItem->m_proc_VSCPClose(pDeviceItem->m_openHandle);
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL2) {
-      spdlog::info("{}: [Device tread] Level II Closed.", pDeviceItem->m_strName);
-    }
+    spdlog::info("{}: [Device tread] Level II Closed.", pDeviceItem->m_strName);
 
     pDeviceItem->m_bQuit = true;
     pDeviceItem->m_mqttClient.disconnect();
@@ -758,10 +735,8 @@ deviceThread(void *pData)
     // Unload dll
     dlclose(hdll);
 
-    if (gDebugLevel & VSCP_DEBUG_DRIVERL2) {
-      spdlog::debug("{}: [Device tread] Level II Done waiting for threads.",
+    spdlog::debug("{}: [Device tread] Level II Done waiting for threads.",
                                    pDeviceItem->m_strName.c_str());
-    }
   }
 
   return NULL;

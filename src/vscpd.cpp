@@ -86,7 +86,6 @@
 // Globals for the daemon
 int gbStopDaemon;
 bool gbDontRunAsDaemon = false;
-uint64_t gDebugLevel   = 0;
 
 // The default random encryption key
 uint8_t __vscp_key[32] = { 0x2d, 0xbb, 0x07, 0x9a, 0x38, 0x98, 0x5a, 0xf0, 0x0e, 0xbe, 0xef,
@@ -306,13 +305,6 @@ main(int argc, char **argv)
         break;
 
       case 'd': {
-        std::string debugFlags = optarg;
-        if (debugFlags.size() > 2 && debugFlags[0] == '0' && (debugFlags[1] == 'b' || debugFlags[1] == 'B')) {
-          gDebugLevel = std::stoull(debugFlags.substr(2), nullptr, 2);
-        }
-        else {
-          gDebugLevel = std::stoull(debugFlags);
-        }
         console->info("Debug flags=%s\n", optarg);
         VSCP_UDP_LOG("Debugflags=%s", optarg);
         break;
@@ -545,7 +537,6 @@ help(char *szPrgname)
   fprintf(stderr, "\t-s\tStandalone (don't run as daemon). \n");
   fprintf(stderr, "\t-r\tSpecify VSCP root folder (default:%s). \n", VSCPD_DEFAULT_ROOT_FOLDER);
   fprintf(stderr, "\t-c\tSpecify a configuration file (with path). \n");
-  fprintf(stderr, "\t-d\tDebug flags (64 bit (bin/dec/hex value)). \n");
   fprintf(stderr, "\t-k\t32 byte encryption key string in hex format. \n");
   fprintf(stderr, "that should be used (default: %s).\n", VSCPD_DEFAULT_CONFIG_FILE);
   fprintf(stderr, "\t-g\tPrint MIT license.\n");

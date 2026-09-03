@@ -106,6 +106,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/udp_sink.h"
 #ifdef __linux__
 #include "spdlog/sinks/syslog_sink.h"
@@ -130,7 +131,6 @@ foo(const int i)
 
 // From vscp.cpp
 extern uint8_t __vscp_key[32]; // (256 bits / 32 bytes)
-extern uint64_t gDebugLevel;
 
 // Prototypes
 
@@ -154,7 +154,7 @@ extern uint64_t gDebugLevel;
 
 //   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   if (gDebugLevel & VSCP_DEBUG_MQTT_LOG) {
+//   {
 //     char buf[80];
 //     time_t tm;
 //     time(&tm);
@@ -183,7 +183,7 @@ extern uint64_t gDebugLevel;
 
 //   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   if (gDebugLevel & VSCP_DEBUG_MQTT_CONNECT) {
+//   {
 //     if (spdlog::get("logger") != nullptr) {
 //       spdlog::debug("MQTT connect:");
 //     }
@@ -207,7 +207,7 @@ extern uint64_t gDebugLevel;
 
 //   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   if (gDebugLevel & VSCP_DEBUG_MQTT_CONNECT) {
+//   {
 //     if (spdlog::get("logger") != nullptr) {
 //       spdlog::debug("MQTT disconnect:");
 //     }
@@ -235,7 +235,7 @@ extern uint64_t gDebugLevel;
 //   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 //   std::string payload((const char *) pMsg->payload, pMsg->payloadlen); // String payload
 
-//   if (gDebugLevel & VSCP_DEBUG_MQTT_MSG) {
+//   {
 //     if (spdlog::get("logger") != nullptr) {
 //       spdlog::trace("MQTT Message: Topic = [{}] - Payload: [{}]", pMsg->topic, payload);
 //     }
@@ -259,7 +259,7 @@ extern uint64_t gDebugLevel;
 
 //   CControlObject *pObj = reinterpret_cast<CControlObject *>(pData);
 
-//   if (gDebugLevel & VSCP_DEBUG_MQTT_PUBLISH) {
+//   {
 //     if (spdlog::get("logger") != nullptr) {
 //       spdlog::trace("MQTT Publish:");
 //     }
@@ -276,7 +276,7 @@ CControlObject::CControlObject()
 {
   m_bQuit = false;
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
+  {
     spdlog::debug("ControlObject: Starting the vscpd daemon");
   }
 
@@ -356,18 +356,16 @@ CControlObject::CControlObject()
 
 CControlObject::~CControlObject()
 {
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
+
     spdlog::debug("controlobject:  Cleaning up");
-  }
+
 
   if (0 != pthread_mutex_destroy(&m_mutex_DeviceList)) {
     spdlog::error("controlobject:  Unable to destroy m_mutex_DeviceList");
     return;
   }
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::error("controlobject:  Terminating the vscpd daemon.");
-  }
+  spdlog::info("controlobject:  Terminating the vscpd daemon.");
 
   // Clean up SQLite lib allocations
   sqlite3_shutdown();
@@ -405,12 +403,8 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
   //                           Read configuration
   ////////////////////////////////////////////////////////////////////////////
 
-  spdlog::info("gDebugLevel={}", gDebugLevel);
-
   // Read JSON configuration
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("Reading configuration file");
-  }
+  spdlog::debug("Reading configuration file");
 
   // Read configuration
   if (!readConfiguration(strcfgfile)) {
@@ -418,15 +412,13 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     return FALSE;
   }
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("Configuration file read successfully.");
-  }
+  spdlog::debug("Configuration file read successfully.");
 
   /////////////////////////////////////////////////////////////////////////////
   //                           Setup logging
   /////////////////////////////////////////////////////////////////////////////
 
-  // 1. Console sink — available immediately, before config is read
+  // Console sink — if one is available drop it first
   auto existing = spdlog::get("console");
   if (existing) {
     spdlog::drop("console");
@@ -442,8 +434,9 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
 
   spdlog::info("starting up, console-only for now");
 
-  // 2. File sink — everything, for later inspection
-  auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("/tmp/mqttvscpd.log", true);
+  // File sink 
+  auto file_sink =
+    std::make_shared<spdlog::sinks::rotating_file_sink_mt>(m_path_to_log_file.c_str(), m_max_log_size, m_max_log_files);
   file_sink->set_level(spdlog::level::trace);
   file_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%s:%#] %v");
   logger->sinks().push_back(file_sink);
@@ -477,10 +470,13 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     }
   }
 
+  spdlog::debug("Logging initialized. Log file: {}", m_path_to_log_file);
+
   spdlog::info("Starting mqttvscpd daemon, version {} ({})", MQTTVSCPD_DISPLAY_VERSION, MQTTVSCPD_COPYRIGHT);
   spdlog::debug("debug message - file only (console filters warn+, udp filters info+)");
   spdlog::warn("warn message");
   spdlog::error("error message");
+  spdlog::info("info message");
 
 #ifndef WIN32
   if (m_runAsUser.length()) {
@@ -511,9 +507,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
   }
 #endif
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("Using configuration file: {}", strcfgfile);
-  }
+  spdlog::debug("Using configuration file: {}", strcfgfile);
 
   // Get GUID
   if (m_guid.isNULL()) {
@@ -563,13 +557,9 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
         std::string name                 = (const char *) sqlite3_column_text(ppStmt, 1);
         std::string token                = (const char *) sqlite3_column_text(ppStmt, 2);
         m_map_class_id2Token[vscp_class] = token;
-        if (gDebugLevel & VSCP_DEBUG_EVENT_DATABASE) {
-          spdlog::debug("Class = {} - ", m_map_class_id2Token[vscp_class]);
-        }
+        spdlog::debug("Class = {} - ", m_map_class_id2Token[vscp_class]);
         m_map_class_token2Id[token] = vscp_class;
-        if (gDebugLevel & VSCP_DEBUG_EVENT_DATABASE) {
-          spdlog::debug("Id = {}", m_map_class_token2Id[token]);
-        }
+        spdlog::debug("Id = {}", m_map_class_token2Id[token]);
       }
       sqlite3_finalize(ppStmt);
 
@@ -588,13 +578,9 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
         uint16_t link_to_class                                 = (uint16_t) sqlite3_column_int(ppStmt, 1);
         std::string token                                      = (const char *) sqlite3_column_text(ppStmt, 2);
         m_map_type_id2Token[(link_to_class << 16) + vscp_type] = token;
-        if (gDebugLevel & VSCP_DEBUG_EVENT_DATABASE) {
-          spdlog::debug("Token = {} ", m_map_type_id2Token[(link_to_class << 16) + vscp_type]);
-        }
+        spdlog::debug("Token = {} ", m_map_type_id2Token[(link_to_class << 16) + vscp_type]);
         m_map_type_token2Id[token] = (link_to_class << 16) + vscp_type;
-        if (gDebugLevel & VSCP_DEBUG_EVENT_DATABASE) {
-          spdlog::debug("Id = {}", m_map_type_token2Id[token]);
-        }
+        spdlog::debug("Id = {}", m_map_type_token2Id[token]);
       }
       sqlite3_finalize(ppStmt);
       sqlite3_close(db_vscp_classtype);
@@ -636,9 +622,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
           std::string guid                = (const char *) sqlite3_column_text(ppStmt, 0);
           std::string name                = (const char *) sqlite3_column_text(ppStmt, 1);
           m_map_discoveryGuidToName[guid] = name;
-          if (gDebugLevel & VSCP_DEBUG_MAIN_DATABASE) {
-            spdlog::info("controlobject: Read in discovered nodes: guid={} - name={} ", guid, name);
-          }
+          spdlog::info("controlobject: Read in discovered nodes: guid={} - name={} ", guid, name);
         }
 
         sqlite3_finalize(ppStmt);
@@ -722,14 +706,10 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
 bool
 CControlObject::cleanup(void)
 {
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject:  cleanup - Giving worker threads time to stop "
+  spdlog::debug("controlobject:  cleanup - Giving worker threads time to stop "
                   "operations...");
-  }
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject:   cleanup - Stopping device worker thread...");
-  }
+  spdlog::debug("controlobject:   cleanup - Stopping device worker thread...");
 
   try {
     stopDeviceWorkerThreads();
@@ -738,9 +718,7 @@ CControlObject::cleanup(void)
     spdlog::error("ControlObject: Exception occurred when stoping device worker threads.");
   }
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("ControlObject: cleanup - Stopping VSCP Server worker thread...");
-  }
+  spdlog::debug("ControlObject: cleanup - Stopping VSCP Server worker thread...");
 
   // Disconnect in case were not
   m_mqttClient.disconnect();
@@ -777,7 +755,7 @@ CControlObject::init_mqtt()
     m_mqttClient.setUserEscape("utc-start-time", std::string(buf));
   }
 
-  m_mqttClient.setUserEscape("server-debug-level", vscp_str_format("0x%" PRIx64, gDebugLevel));
+  m_mqttClient.setUserEscape("server-debug-level", "enabled");
 
   // Add class/type tokens
   m_mqttClient.setTokenMaps(&m_map_class_id2Token, &m_map_type_id2Token);
@@ -975,9 +953,7 @@ CControlObject::run(void)
   sd_notify(0, "READY=1");
 #endif
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("Controlobject: run");
-  }
+  spdlog::debug("Controlobject: run");
 
   // init MQTT
   try {
@@ -1015,9 +991,7 @@ CControlObject::run(void)
   clock_gettime(CLOCK_REALTIME, &old_now);
   old_now.tv_sec -= 60; // Do first send right away
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject: Main loop starting...");
-  }
+  spdlog::debug("controlobject: Main loop starting...");
 
   while (!m_bQuit) {
 
@@ -1042,9 +1016,7 @@ CControlObject::run(void)
 
   } // while
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject: Main loop ending...");
-  }
+  spdlog::debug("controlobject: Main loop ending...");
 
   spdlog::debug("Controlobject: starting shutdown");
 
@@ -1059,9 +1031,7 @@ CControlObject::run(void)
   catch (...) {
   }
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("Controlobject: end run");
-  }
+  spdlog::debug("Controlobject: end run");
 
   return true;
 }
@@ -1323,9 +1293,7 @@ bool
 CControlObject::startDeviceWorkerThreads(void)
 {
   CDeviceItem *pDeviceItem;
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject: [Driver] - Starting drivers...");
-  }
+  spdlog::debug("controlobject: [Driver] - Starting drivers...");
 
   std::deque<CDeviceItem *>::iterator it;
   for (it = m_deviceList.m_devItemList.begin(); it != m_deviceList.m_devItemList.end(); ++it) {
@@ -1333,17 +1301,13 @@ CControlObject::startDeviceWorkerThreads(void)
     pDeviceItem = *it;
     if (NULL != pDeviceItem) {
 
-      if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-        spdlog::debug("Controlobject: [Driver] - Preparing: {} ", pDeviceItem->m_strName);
-      }
+      spdlog::debug("Controlobject: [Driver] - Preparing: {} ", pDeviceItem->m_strName);
 
       // Just start if enabled
       if (!pDeviceItem->m_bEnable)
         continue;
 
-      if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-        spdlog::debug("Controlobject: [Driver] - Starting: {} ", pDeviceItem->m_strName);
-      }
+      spdlog::debug("Controlobject: [Driver] - Starting: {} ", pDeviceItem->m_strName);
 
       // Start  the driver logic
       pDeviceItem->startDriver(this);
@@ -1351,9 +1315,7 @@ CControlObject::startDeviceWorkerThreads(void)
     } // Valid device item
   }
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject: [Driver] - Drivers started (if any)");
-  }
+  spdlog::debug("controlobject: [Driver] - Drivers started (if any)");
 
   return true;
 }
@@ -1367,17 +1329,13 @@ CControlObject::stopDeviceWorkerThreads(void)
 {
   CDeviceItem *pDeviceItem;
 
-  if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-    spdlog::debug("controlobject: [Driver] - Stopping drivers...");
-  }
+  spdlog::debug("controlobject: [Driver] - Stopping drivers...");
   std::deque<CDeviceItem *>::iterator iter;
   for (iter = m_deviceList.m_devItemList.begin(); iter != m_deviceList.m_devItemList.end(); ++iter) {
 
     pDeviceItem = *iter;
     if (NULL != pDeviceItem) {
-      if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-        spdlog::debug("Controlobject: [Driver] - Stopping: {} ", pDeviceItem->m_strName);
-      }
+      spdlog::debug("Controlobject: [Driver] - Stopping: {} ", pDeviceItem->m_strName);
       pDeviceItem->stopDriver();
     }
   }
@@ -1553,15 +1511,13 @@ CControlObject::getMacAddress(cguid &guid)
             continue;
           }
 
-          if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-            spdlog::debug("Ethernet MAC address: {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}",
+          spdlog::debug("Ethernet MAC address: {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}",
                           mac[0],
                           mac[1],
                           mac[2],
                           mac[3],
                           mac[4],
                           mac[5]);
-          }
 
           guid.setAt(0, 0xff);
           guid.setAt(1, 0xff);
@@ -1613,15 +1569,13 @@ CControlObject::getMacAddress(cguid &guid)
   if (0 == ioctl(fd, SIOCGIFHWADDR, &s)) {
 
     // ptr = (unsigned char *)&s.ifr_ifru.ifru_hwaddr.sa_data[0];
-    if (gDebugLevel & VSCP_DEBUG_EXTRA) {
-      spdlog::debug("Ethernet MAC address: {0:02X]:{1:02X}:{2:02X}:{3:02X}:{4:02X}:{5:02X}",
+    spdlog::debug("Ethernet MAC address: {0:02X]:{1:02X}:{2:02X}:{3:02X}:{4:02X}:{5:02X}",
                     (uint8_t) s.ifr_addr.sa_data[0],
                     (uint8_t) s.ifr_addr.sa_data[1],
                     (uint8_t) s.ifr_addr.sa_data[2],
                     (uint8_t) s.ifr_addr.sa_data[3],
                     (uint8_t) s.ifr_addr.sa_data[4],
                     (uint8_t) s.ifr_addr.sa_data[5]);
-    }
 
     guid.setAt(0, 0xff);
     guid.setAt(1, 0xff);
@@ -1752,9 +1706,7 @@ CControlObject::readJSON(const json &j)
       return false;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'runasuser' set to {}", m_runAsUser.c_str());
-    }
+    spdlog::debug("ReadConfig: 'runasuser' set to {}", m_runAsUser.c_str());
   }
   catch (...) {
     spdlog::error("ReadConfig: Failed to read 'runasuser'. Must be present.");
@@ -1770,9 +1722,7 @@ CControlObject::readJSON(const json &j)
       return false;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'guid' set to {}", m_guid.getAsString());
-    }
+    spdlog::debug("ReadConfig: 'guid' set to {}", m_guid.getAsString());
   }
   catch (...) {
     spdlog::error("ReadConfig: Failed to read 'guid'. Must be present.");
@@ -1788,41 +1738,10 @@ CControlObject::readJSON(const json &j)
       return false;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'servername' set to {}", m_strServerName);
-    }
+    spdlog::debug("ReadConfig: 'servername' set to {}", m_strServerName);
   }
   catch (...) {
     spdlog::error("ReadConfig: Failed to read 'servername'. Must be present.");
-    return false;
-  }
-
-  try {
-    if (j.contains("debug")) {
-      if (j["debug"].is_number()) {
-        gDebugLevel = j["debug"].get<uint64_t>();
-      }
-      else if (j["debug"].is_string()) {
-        std::string str = j["debug"].get<std::string>();
-        vscp_makeLower(str);
-        vscp_trim(str);
-        gDebugLevel = strtoull(str.c_str(), NULL, 16);
-      }
-      else {
-        spdlog::error("ReadConfig: Failed to read 'debug'. Not string. Not number. What?");
-      }
-    }
-    else {
-      spdlog::error("ReadConfig: Failed to read 'debug'. Must be present.");
-      return false;
-    }
-
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'debug' set to {0:x}", gDebugLevel);
-    }
-  }
-  catch (...) {
-    spdlog::error("ReadConfig: Failed to read 'debug'. Must be present.");
     return false;
   }
 
@@ -1835,9 +1754,7 @@ CControlObject::readJSON(const json &j)
       return false;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'classtypedb' set to {}", m_pathClassTypeDefinitionDb);
-    }
+    spdlog::debug("ReadConfig: 'classtypedb' set to {}", m_pathClassTypeDefinitionDb);
   }
   catch (...) {
     spdlog::error("ReadConfig: Failed to read 'classtypedb'. Must be present.");
@@ -1853,9 +1770,7 @@ CControlObject::readJSON(const json &j)
       return false;
     }
 
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'maindb' set to {}", m_pathMainDb);
-    }
+    spdlog::debug("ReadConfig: 'maindb' set to {}", m_pathMainDb);
   }
   catch (...) {
     spdlog::error("ReadConfig: Failed to read 'maindb'. Must be present.");
@@ -1871,9 +1786,7 @@ CControlObject::readJSON(const json &j)
       spdlog::error("ReadConfig: 'Failed to read in encryption key {}", pathvscpkey);
     }
 
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: 'path to vscp key' set to {}", pathvscpkey);
-    }
+    spdlog::debug("ReadConfig: 'path to vscp key' set to {}", pathvscpkey);
 
     if (!readEncryptionKey(pathvscpkey)) {
       spdlog::error(
@@ -1888,9 +1801,7 @@ CControlObject::readJSON(const json &j)
 
   // Logging
   if (!(j.contains("logging") && j["logging"].is_object())) {
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: logging object. Defaults will be used for all values.");
-    }
+    spdlog::debug("ReadConfig: logging object. Defaults will be used for all values.");
   }
   else {
 
@@ -1905,14 +1816,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'file-enable-log' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'file-enable-log' set to {}", m_bEnableFileLog ? "true" : "false");
-      }
+      spdlog::debug("ReadConfig: LOGGING 'file-enable-log' set to {}", m_bEnableFileLog ? "true" : "false");
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-enable-log' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-enable-log' Defaults will be used.");
     }
 
     // Logging: file-log-level
@@ -1930,54 +1837,38 @@ CControlObject::readJSON(const json &j)
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
         m_fileLogLevel = spdlog::level::off;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'off'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'off'.");
       }
       else if (std::string::npos != str.find("critical")) {
         m_fileLogLevel = spdlog::level::critical;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'critical'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'critical'.");
       }
       else if (std::string::npos != str.find("err")) {
         m_fileLogLevel = spdlog::level::err;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'err'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'err'.");
       }
       else if (std::string::npos != str.find("warn")) {
         m_fileLogLevel = spdlog::level::warn;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'warn'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'warn'.");
       }
       else if (std::string::npos != str.find("info")) {
         m_fileLogLevel = spdlog::level::info;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'info'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'info'.");
       }
       else if (std::string::npos != str.find("debug")) {
         m_fileLogLevel = spdlog::level::debug;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'debug'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'debug'.");
       }
       else if (std::string::npos != str.find("trace")) {
         m_fileLogLevel = spdlog::level::trace;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'trace'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'file-log-level' set to 'trace'.");
       }
       else {
         spdlog::debug("ReadConfig: LOGGING 'file-log-level' has invalid value [{}]. Default value used.", str);
       }
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-log-level' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-log-level' Defaults will be used.");
     }
 
     // Logging: file-pattern
@@ -1991,14 +1882,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'file-pattern' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'file-pattern' set to {}.", m_fileLogPattern);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'file-pattern' set to {}.", m_fileLogPattern);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-pattern' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-pattern' Defaults will be used.");
     }
 
     // Logging: file-path
@@ -2012,14 +1899,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'file-path' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'file-path' set to '{}'.", m_path_to_log_file);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'file-path' set to '{}'.", m_path_to_log_file);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-path' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-path' Defaults will be used.");
     }
 
     // Logging: file-max-size
@@ -2033,14 +1916,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'file-max-size' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'file-max-size' set to '{}'.", m_max_log_size);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'file-max-size' set to '{}'.", m_max_log_size);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-max-size' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-max-size' Defaults will be used.");
     }
 
     // Logging: file-max-files
@@ -2054,14 +1933,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'file-max-files' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'file-max-files' set to '{}'.", m_max_log_files);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'file-max-files' set to '{}'.", m_max_log_files);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-max-files' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-max-files' Defaults will be used.");
     }
 
     // Console
@@ -2077,14 +1952,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'console-enable-log' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'console-enable-log' set to {}", m_bEnableConsoleLog ? "true" : "false");
-      }
+      spdlog::debug("ReadConfig: LOGGING 'console-enable-log' set to {}", m_bEnableConsoleLog ? "true" : "false");
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'console-enable-log' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'console-enable-log' Defaults will be used.");
     }
 
     // Logging: console-log-level
@@ -2102,54 +1973,38 @@ CControlObject::readJSON(const json &j)
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
         m_consoleLogLevel = spdlog::level::off;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'off'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'off'.");
       }
       else if (std::string::npos != str.find("critical")) {
         m_consoleLogLevel = spdlog::level::critical;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'critical'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'critical'.");
       }
       else if (std::string::npos != str.find("err")) {
         m_consoleLogLevel = spdlog::level::err;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'err'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'err'.");
       }
       else if (std::string::npos != str.find("warn")) {
         m_consoleLogLevel = spdlog::level::warn;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'warn'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'warn'.");
       }
       else if (std::string::npos != str.find("info")) {
         m_consoleLogLevel = spdlog::level::info;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'info'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'info'.");
       }
       else if (std::string::npos != str.find("debug")) {
         m_consoleLogLevel = spdlog::level::debug;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'debug'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'debug'.");
       }
       else if (std::string::npos != str.find("trace")) {
         m_consoleLogLevel = spdlog::level::trace;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'trace'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'console-log-level' set to 'trace'.");
       }
       else {
         spdlog::debug("ReadConfig: LOGGING 'console-log-level' has invalid value [{}]. Default value used.", str);
       }
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'file-log-level' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'file-log-level' Defaults will be used.");
     }
 
     // Logging: console-pattern
@@ -2163,14 +2018,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'console-pattern' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'console-pattern' set to {}.", m_consoleLogPattern);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'console-pattern' set to {}.", m_consoleLogPattern);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'console-pattern' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'console-pattern' Defaults will be used.");
     }
 
     // syslog
@@ -2186,14 +2037,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'syslog-enable-log' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'syslog-enable-log' set to {}", m_bEnableSysLog ? "true" : "false");
-      }
+      spdlog::debug("ReadConfig: LOGGING 'syslog-enable-log' set to {}", m_bEnableSysLog ? "true" : "false");
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-enable-log' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-enable-log' Defaults will be used.");
     }
 
     // Logging: syslog-log-level
@@ -2211,54 +2058,38 @@ CControlObject::readJSON(const json &j)
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
         m_sysLogLevel = spdlog::level::off;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'off'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'off'.");
       }
       else if (std::string::npos != str.find("critical")) {
         m_sysLogLevel = spdlog::level::critical;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'critical'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'critical'.");
       }
       else if (std::string::npos != str.find("err")) {
         m_sysLogLevel = spdlog::level::err;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'err'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'err'.");
       }
       else if (std::string::npos != str.find("warn")) {
         m_sysLogLevel = spdlog::level::warn;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'warn'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'warn'.");
       }
       else if (std::string::npos != str.find("info")) {
         m_sysLogLevel = spdlog::level::info;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'info'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'info'.");
       }
       else if (std::string::npos != str.find("debug")) {
         m_sysLogLevel = spdlog::level::debug;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'debug'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'debug'.");
       }
       else if (std::string::npos != str.find("trace")) {
         m_sysLogLevel = spdlog::level::trace;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'trace'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' set to 'trace'.");
       }
       else {
         spdlog::debug("ReadConfig: LOGGING 'syslog-log-level' has invalid value [{}]. Default value used.", str);
       }
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-log-level' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-log-level' Defaults will be used.");
     }
 
     // Logging: syslog-ident
@@ -2272,14 +2103,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'syslog-ident' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'syslog-ident' set to {}.", m_sysLogIdent);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'syslog-ident' set to {}.", m_sysLogIdent);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-ident' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'syslog-ident' Defaults will be used.");
     }
 
     // UDP logging
@@ -2293,14 +2120,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'udp-enable-log' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'udp-enable-log' set to {}", m_bEnableUdpLog ? "true" : "false");
-      }
+      spdlog::debug("ReadConfig: LOGGING 'udp-enable-log' set to {}", m_bEnableUdpLog ? "true" : "false");
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-enable-log' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-enable-log' Defaults will be used.");
     }
 
     // UDP logging level
@@ -2318,45 +2141,31 @@ CControlObject::readJSON(const json &j)
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
         m_udpLogLevel = spdlog::level::off;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'off'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'off'.");
       }
       else if (std::string::npos != str.find("critical")) {
         m_udpLogLevel = spdlog::level::critical;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'critical'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'critical'.");
       }
       else if (std::string::npos != str.find("err")) {
         m_udpLogLevel = spdlog::level::err;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'err'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'err'.");
       }
       else if (std::string::npos != str.find("warn")) {
         m_udpLogLevel = spdlog::level::warn;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'warn'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'warn'.");
       }
       else if (std::string::npos != str.find("info")) {
         m_udpLogLevel = spdlog::level::info;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'info'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'info'.");
       }
       else if (std::string::npos != str.find("debug")) {
         m_udpLogLevel = spdlog::level::debug;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'debug'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'debug'.");
       }
       else if (std::string::npos != str.find("trace")) {
         m_udpLogLevel = spdlog::level::trace;
-        if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-          spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'trace'.");
-        }
+        spdlog::debug("ReadConfig: LOGGING 'udp-log-level' set to 'trace'.");
       }
       else {
         spdlog::debug("ReadConfig: LOGGING 'udp-log-level' has invalid value [{}]. Default value used.", str);
@@ -2374,14 +2183,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'udp-pattern' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'udp-pattern' set to {}.", m_udpLogPattern);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'udp-pattern' set to {}.", m_udpLogPattern);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-pattern' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-pattern' Defaults will be used.");
     }
 
     // Logging: udp-host
@@ -2395,14 +2200,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'udp-host' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'udp-host' set to {}.", m_udpLogHost);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'udp-host' set to {}.", m_udpLogHost);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-host' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-host' Defaults will be used.");
     }
 
     // Logging: udp-port
@@ -2416,14 +2217,10 @@ CControlObject::readJSON(const json &j)
       catch (...) {
         spdlog::error("Failed to read 'udp-port' due to unknown error.");
       }
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: LOGGING 'udp-port' set to {}.", m_udpLogPort);
-      }
+      spdlog::debug("ReadConfig: LOGGING 'udp-port' set to {}.", m_udpLogPort);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-port' Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-port' Defaults will be used.");
     }
 
   } // logging
@@ -2433,9 +2230,7 @@ CControlObject::readJSON(const json &j)
   // ********************************************************************************
 
   if (!(j.contains("mqtt") && j["mqtt"].is_object())) {
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
-    }
+    spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
   }
   else {
 
@@ -2451,39 +2246,27 @@ CControlObject::readJSON(const json &j)
 
     if (j["mqtt"].contains("topic-daemon-base")) {
       m_topicDaemonBase = j["mqtt"]["topic-daemon-base"].get<std::string>();
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: MQTT 'topic-daemon-base' set to {}", m_topicDaemonBase);
-      }
+      spdlog::debug("ReadConfig: MQTT 'topic-daemon-base' set to {}", m_topicDaemonBase);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read MQTT 'topic-daemon-base'. Defaults will be used \"\".");
-      }
+      spdlog::debug("ReadConfig: Failed to read MQTT 'topic-daemon-base'. Defaults will be used \"\".");
     }
 
     if (j["mqtt"].contains("topic-drivers")) {
       m_topicDrivers = j["mqtt"]["topic-drivers"].get<std::string>();
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: MQTT 'topic-drivers' set to {}", m_topicDrivers);
-      }
+      spdlog::debug("ReadConfig: MQTT 'topic-drivers' set to {}", m_topicDrivers);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read MQTT 'topic-drivers'. Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read MQTT 'topic-drivers'. Defaults will be used.");
     }
 
     // MQTT topic-discovery
     if (j["mqtt"].contains("topic-discovery")) {
       m_topicDiscovery = j["mqtt"]["topic-discovery"].get<std::string>();
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: MQTT 'topic-discovery' set to {}", m_topicDiscovery);
-      }
+      spdlog::debug("ReadConfig: MQTT 'topic-discovery' set to {}", m_topicDiscovery);
     }
     else {
-      if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-        spdlog::debug("ReadConfig: Failed to read MQTT 'topic-discovery'. Defaults will be used.");
-      }
+      spdlog::debug("ReadConfig: Failed to read MQTT 'topic-discovery'. Defaults will be used.");
     }
 
     // Add base as prefix if defined
@@ -2499,9 +2282,7 @@ CControlObject::readJSON(const json &j)
   // ------------------------------------------------------------------------------------------------------------------------
 
   if (!(j.contains("drivers") && j["drivers"].is_object())) {
-    if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-      spdlog::debug("ReadConfig: drivers object. No drivers will be used.");
-    }
+    spdlog::debug("ReadConfig: drivers object. No drivers will be used.");
   }
   else {
     // Level I drivers
@@ -2530,20 +2311,16 @@ CControlObject::readJSON(const json &j)
           }
           else {
 
-            if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-              spdlog::debug("ReadConfig: Level I driver added. name = {} - [{}]",
+            spdlog::debug("ReadConfig: Level I driver added. name = {} - [{}]",
                             (*it)["name"].get<std::string>(),
                             (*it)["path"].get<std::string>());
-            }
 
             // ********************************************************************************
             //                               Level I driver MQTT
             // ********************************************************************************
 
             if (!((*it).contains("mqtt") && (*it)["mqtt"].is_object())) {
-              if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-                spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
-              }
+              spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
             }
             else {
 
@@ -2592,20 +2369,16 @@ CControlObject::readJSON(const json &j)
                           (*it)["path-driver"].get<std::string>());
           }
           else {
-            if (gDebugLevel & VSCP_DEBUG_DRIVERL1) {
-              spdlog::debug("ReadConfig: Level II driver added. name = {}- [{}]",
+            spdlog::debug("ReadConfig: Level II driver added. name = {}- [{}]",
                             (*it)["name"].get<std::string>(),
                             (*it)["path-driver"].get<std::string>());
-            }
 
             // ********************************************************************************
             //                               Level II driver MQTT
             // ********************************************************************************
 
             if (!((*it).contains("mqtt") && (*it)["mqtt"].is_object())) {
-              if (gDebugLevel & VSCP_DEBUG_CONFIG) {
-                spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
-              }
+              spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
             }
             else {
 

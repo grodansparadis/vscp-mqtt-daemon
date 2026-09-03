@@ -24,28 +24,24 @@ The **debug** entry in the configuration file let you set flags to get different
 The log file is by default located at 
 
 ```bash
-sudo cat /var/log/log/vscp/vscpd.log
+sudo cat /var/log/log/vscp/mqttvscpd.log
 ```
 
 or with
 
 ```bash
-sudo tail -f /var/log/log/vscp/vscpd.log
+sudo tail -f /var/log/log/vscp/mqttvscpd.log
 ```
 
 but there is also [lnav](http://lnav.org/) and other tools that can be used to view the system logs on your system. For a graphical viewer we can recommend [qjournalctl](https://github.com/pentix/qjournalctl).
 
 ```
-lnav /var/log/vscp/vscpd.log
+lnav /var/log/vscp/mqttvscpd.log
 ```
 
 Do not set debug bits for information you are not interested in. There can be much information anyway without getting info from sources you have no problem or interest in.
 
-### Definition of flags
 
-Flags (bits) of the debug number is described [here](https://github.com/grodansparadis/vscp/blob/master/src/vscp/common/vscp_debug.h)
-
-The right hand number in (1 << n), 'n', is the bit position counter from the right. As a number it will be 2^n. So to get  debug messages for level I drivers receive channel bit eight should be set. That is the same as adding 2^8 = 256 to the debug number.
 
 ## Driver log files
 VSCP Level II drivers write debug information to a log file. The log file for a driver is typically located at __/var/log/vscp/vscp_drv_<driver_name>.log__.
