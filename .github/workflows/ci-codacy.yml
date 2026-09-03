@@ -48,6 +48,8 @@ jobs:
                 )
                 | .value
               )
+            # GitHub code scanning rejects SARIF uploads with more than 20 runs.
+            | .runs |= .[:20]
           ' results.sarif > results-normalized.sarif
 
       - name: Upload SARIF results to GitHub code scanning
