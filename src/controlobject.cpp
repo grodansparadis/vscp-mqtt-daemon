@@ -359,6 +359,11 @@ CControlObject::~CControlObject()
 
     spdlog::debug("controlobject:  Cleaning up");
 
+  // Close the daemon database if open
+  if (nullptr != m_db_vscp_daemon) {
+    sqlite3_close(m_db_vscp_daemon);
+    m_db_vscp_daemon = nullptr;
+  }
 
   if (0 != pthread_mutex_destroy(&m_mutex_DeviceList)) {
     spdlog::error("controlobject:  Unable to destroy m_mutex_DeviceList");
@@ -546,17 +551,18 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
                       rv,
                       sqlite3_errmsg(db_vscp_classtype));
       }
-
-      while (SQLITE_ROW == sqlite3_step(ppStmt)) {
-        uint16_t vscp_class              = (uint16_t) sqlite3_column_int(ppStmt, 0);
-        std::string name                 = (const char *) sqlite3_column_text(ppStmt, 1);
-        std::string token                = (const char *) sqlite3_column_text(ppStmt, 2);
-        m_map_class_id2Token[vscp_class] = token;
-        spdlog::debug("Class = {} - ", m_map_class_id2Token[vscp_class]);
-        m_map_class_token2Id[token] = vscp_class;
-        spdlog::debug("Id = {}", m_map_class_token2Id[token]);
+      else {
+        while (SQLITE_ROW == sqlite3_step(ppStmt)) {
+          uint16_t vscp_class              = (uint16_t) sqlite3_column_int(ppStmt, 0);
+          std::string name                 = (const char *) sqlite3_column_text(ppStmt, 1);
+          std::string token                = (const char *) sqlite3_column_text(ppStmt, 2);
+          m_map_class_id2Token[vscp_class] = token;
+          spdlog::debug("Class = {} - ", m_map_class_id2Token[vscp_class]);
+          m_map_class_token2Id[token] = vscp_class;
+          spdlog::debug("Id = {}", m_map_class_token2Id[token]);
+        }
+        sqlite3_finalize(ppStmt);
       }
-      sqlite3_finalize(ppStmt);
 
       // * * *   T Y P E S   * * *
 
@@ -567,23 +573,26 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
                       rv,
                       sqlite3_errmsg(db_vscp_classtype));
       }
-
-      while (SQLITE_ROW == sqlite3_step(ppStmt)) {
-        uint16_t vscp_type                                     = (uint16_t) sqlite3_column_int(ppStmt, 0);
-        uint16_t link_to_class                                 = (uint16_t) sqlite3_column_int(ppStmt, 1);
-        std::string token                                      = (const char *) sqlite3_column_text(ppStmt, 2);
-        m_map_type_id2Token[(link_to_class << 16) + vscp_type] = token;
-        spdlog::debug("Token = {} ", m_map_type_id2Token[(link_to_class << 16) + vscp_type]);
-        m_map_type_token2Id[token] = (link_to_class << 16) + vscp_type;
-        spdlog::debug("Id = {}", m_map_type_token2Id[token]);
+      else {
+        while (SQLITE_ROW == sqlite3_step(ppStmt)) {
+          uint16_t vscp_type                                     = (uint16_t) sqlite3_column_int(ppStmt, 0);
+          uint16_t link_to_class                                 = (uint16_t) sqlite3_column_int(ppStmt, 1);
+          std::string token                                      = (const char *) sqlite3_column_text(ppStmt, 2);
+          m_map_type_id2Token[(link_to_class << 16) + vscp_type] = token;
+          spdlog::debug("Token = {} ", m_map_type_id2Token[(link_to_class << 16) + vscp_type]);
+          m_map_type_token2Id[token] = (link_to_class << 16) + vscp_type;
+          spdlog::debug("Id = {}", m_map_type_token2Id[token]);
+        }
+        sqlite3_finalize(ppStmt);
       }
-      sqlite3_finalize(ppStmt);
       sqlite3_close(db_vscp_classtype);
     }
     else {
       spdlog::error("controlobject:  Failed to open VSCP class & type definition database {}. [{}]",
                     m_pathClassTypeDefinitionDb,
                     sqlite3_errmsg(db_vscp_classtype));
+      // A handle is allocated even on open failure and must be closed
+      sqlite3_close(db_vscp_classtype);
     }
   }
 
@@ -601,6 +610,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
         spdlog::error("controlobject:  VSCP Daemon database could not be opened/created. - Path={} error={}",
                       m_pathMainDb,
                       sqlite3_errmsg(m_db_vscp_daemon));
+        sqlite3_close(m_db_vscp_daemon);
         m_db_vscp_daemon = NULL;
       }
       else {
@@ -612,15 +622,16 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
             (rv = sqlite3_prepare(m_db_vscp_daemon, "SELECT guid,name from discovery", -1, &ppStmt, NULL))) {
           spdlog::error("Failed to prepare discovery node fetch. rv={0} {1}", rv, sqlite3_errmsg(m_db_vscp_daemon));
         }
+        else {
+          while (SQLITE_ROW == sqlite3_step(ppStmt)) {
+            std::string guid                = (const char *) sqlite3_column_text(ppStmt, 0);
+            std::string name                = (const char *) sqlite3_column_text(ppStmt, 1);
+            m_map_discoveryGuidToName[guid] = name;
+            spdlog::info("controlobject: Read in discovered nodes: guid={} - name={} ", guid, name);
+          }
 
-        while (SQLITE_ROW == sqlite3_step(ppStmt)) {
-          std::string guid                = (const char *) sqlite3_column_text(ppStmt, 0);
-          std::string name                = (const char *) sqlite3_column_text(ppStmt, 1);
-          m_map_discoveryGuidToName[guid] = name;
-          spdlog::info("controlobject: Read in discovered nodes: guid={} - name={} ", guid, name);
+          sqlite3_finalize(ppStmt);
         }
-
-        sqlite3_finalize(ppStmt);
       }
     }
     else {
@@ -632,6 +643,8 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
           "controlobject:  VSCP Daemon database could not be opened/created (check access rights). - Path={} error={}",
           m_pathMainDb,
           sqlite3_errmsg(m_db_vscp_daemon));
+        sqlite3_close(m_db_vscp_daemon);
+        m_db_vscp_daemon = NULL;
         return false;
       }
 
@@ -652,6 +665,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, psql, NULL, NULL, &pErrMsg)) {
         spdlog::error("controlobject:  Creation of the VSCP database failed with message {}", pErrMsg);
+        sqlite3_free(pErrMsg);
         return false;
       }
 
@@ -659,6 +673,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, psql, NULL, NULL, &pErrMsg)) {
         spdlog::error("controlobject:  Creation of the VSCP database index idxguid failed with message {}", pErrMsg);
+        sqlite3_free(pErrMsg);
         return false;
       }
 
@@ -666,6 +681,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, psql, NULL, NULL, &pErrMsg)) {
         spdlog::error("controlobject:  Creation of the VSCP database index idxname failed with message {}", pErrMsg);
+        sqlite3_free(pErrMsg);
         return false;
       }
 
@@ -684,6 +700,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, sql.c_str(), NULL, NULL, &pErrMsg)) {
         spdlog::error("controlobject:  Creation of the VSCP database index idxname failed with message {}", pErrMsg);
+        sqlite3_free(pErrMsg);
         return false;
       }
 
@@ -1255,6 +1272,7 @@ CControlObject::discovery(vscpEvent *pev)
 
     if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, sql.c_str(), NULL, NULL, &pErrMsg)) {
       spdlog::info("Failed to add discovery record [{}] Error msg: {}", sql, pErrMsg);
+      sqlite3_free(pErrMsg);
       return;
     }
 

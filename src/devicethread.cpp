@@ -56,7 +56,6 @@
 #include <devicelist.h>
 #include <level2drvdef.h>
 #include <vscp.h>
-#include <vscp-debug.h>
 #include <vscphelper.h>
 
 #include <mustache.hpp>
@@ -100,7 +99,7 @@ receive_event_callback(vscpEvent &ev, void *pobj)
 
     // Use blocking method if available
     if (nullptr != pDeviceItem->m_proc_CanalBlockingSend) {
-      if (CANAL_ERROR_SUCCESS == (rv = pDeviceItem->m_proc_CanalBlockingSend(pDeviceItem->m_openHandle, &msg, 300))) {
+      if (CANAL_ERROR_SUCCESS != (rv = pDeviceItem->m_proc_CanalBlockingSend(pDeviceItem->m_openHandle, &msg, 300))) {
         spdlog::error(
           "driver: {}: mqtt_on_message - Failed to send event (m_proc_CanalBlockingSend) rv={1}",
           pDeviceItem->m_strName.c_str(),
@@ -479,8 +478,11 @@ deviceThread(void *pData)
 
           if (!pDeviceItem->sendEvent(&ev)) {
             spdlog::error("Driver L1: {} Failed to send event to broker.", pDeviceItem->m_strName);
+            vscp_deleteEvent(&ev);
             continue;
           }
+
+          vscp_deleteEvent(&ev);
         }
       } // while
 
@@ -519,6 +521,7 @@ deviceThread(void *pData)
               // Convert CANAL message to VSCP event
               if (!vscp_convertCanalToEvent(pev, &msg, (unsigned char *) pDeviceItem->m_guid.getGUID())) {
                 spdlog::error("Driver L1: {} Failed to convet CANAL to event.", pDeviceItem->m_strName);
+                vscp_deleteEvent_v2(&pev);
                 break;
               }
               pev->obid = 0;
@@ -553,15 +556,11 @@ deviceThread(void *pData)
 
               if (!pDeviceItem->sendEvent(pev)) {
                 spdlog::error("Driver L1: {} Failed to send event to broker.", pDeviceItem->m_strName);
-                if (nullptr == pev) {
-                  vscp_deleteEvent_v2(&pev);
-                }
+                vscp_deleteEvent_v2(&pev);
                 continue;
               }
 
-              if (nullptr == pev) {
-                vscp_deleteEvent_v2(&pev);
-              }
+              vscp_deleteEvent_v2(&pev);
             }
             else {
               spdlog::error("Driver L1: {} Memory problem.\n", pDeviceItem->m_strName);
@@ -718,8 +717,11 @@ deviceThread(void *pData)
 
       if (!pDeviceItem->sendEvent(&ev)) {
         spdlog::error("Driver L2: {} Failed to send event to broker.", pDeviceItem->m_strName.c_str());
+        vscp_deleteEvent(&ev);
         continue;
       }
+
+      vscp_deleteEvent(&ev);
     }
 
     spdlog::debug("{}: [Device tread] Level II Closing.", pDeviceItem->m_strName);
