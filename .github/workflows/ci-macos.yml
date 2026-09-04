@@ -51,7 +51,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: vscpd-${{ env.VSCPD_VERSION }}-macOS
+          name: mqttvscpd-${{ env.VSCPD_VERSION }}-macOS
           if-no-files-found: error
           path: |
             *.tar.gz

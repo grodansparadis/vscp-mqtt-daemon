@@ -86,7 +86,7 @@ jobs:
       - name: Upload Raspberry Pi artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: vscpd-${{ env.VSCPD_VERSION }}-raspberry-pi-${{ matrix.name }}
+          name: mqttvscpd-${{ env.VSCPD_VERSION }}-raspberry-pi-${{ matrix.name }}
           if-no-files-found: error
           path: |
             *.deb
