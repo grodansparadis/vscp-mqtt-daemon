@@ -276,12 +276,19 @@ CControlObject::CControlObject()
 {
   m_bQuit = false;
 
+  m_db_vscp_daemon = nullptr;
+
   {
     spdlog::debug("ControlObject: Starting the vscpd daemon");
   }
 
   if (0 != pthread_mutex_init(&m_mutex_DeviceList, NULL)) {
     spdlog::critical("ControlObject: Unable to init m_mutex_DeviceList. Abort!");
+    return;
+  }
+
+  if (0 != pthread_mutex_init(&m_mutex_discovery, NULL)) {
+    spdlog::critical("ControlObject: Unable to init m_mutex_discovery. Abort!");
     return;
   }
 
@@ -367,6 +374,11 @@ CControlObject::~CControlObject()
 
   if (0 != pthread_mutex_destroy(&m_mutex_DeviceList)) {
     spdlog::error("controlobject:  Unable to destroy m_mutex_DeviceList");
+    return;
+  }
+
+  if (0 != pthread_mutex_destroy(&m_mutex_discovery)) {
+    spdlog::error("controlobject:  Unable to destroy m_mutex_discovery");
     return;
   }
 
@@ -1255,7 +1267,10 @@ CControlObject::discovery(vscpEvent *pev)
   char *pErrMsg = 0;
   cguid guid(pev->GUID);
 
-  if (!m_map_discoveryGuidToName[guid.getAsString()].length()) {
+  // Called from all device threads - serialize map/db/publish access
+  pthread_mutex_lock(&m_mutex_discovery);
+
+  if (m_map_discoveryGuidToName.end() == m_map_discoveryGuidToName.find(guid.getAsString())) {
 
     // Add the daemon as the first database entry
 
@@ -1273,6 +1288,7 @@ CControlObject::discovery(vscpEvent *pev)
     if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, sql.c_str(), NULL, NULL, &pErrMsg)) {
       spdlog::info("Failed to add discovery record [{}] Error msg: {}", sql, pErrMsg);
       sqlite3_free(pErrMsg);
+      pthread_mutex_unlock(&m_mutex_discovery);
       return;
     }
 
@@ -1301,6 +1317,8 @@ CControlObject::discovery(vscpEvent *pev)
     // Add local host to in memory map
     m_map_discoveryGuidToName[guid.getAsString()] = "Discovered";
   }
+
+  pthread_mutex_unlock(&m_mutex_discovery);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -92,6 +92,14 @@ receive_event_callback(vscpEvent &ev, void *pobj)
 
   spdlog::trace("VSCP Event received. class={0} type={1}", ev.vscp_class, ev.vscp_type);
 
+  // Serialize driver access against close in the device thread
+  pthread_mutex_lock(&pDeviceItem->m_deviceMutex);
+
+  if (pDeviceItem->m_bQuit || (0 == pDeviceItem->m_openHandle)) {
+    pthread_mutex_unlock(&pDeviceItem->m_deviceMutex);
+    return;
+  }
+
   if (VSCP_DRIVER_LEVEL1 == pDeviceItem->m_driverLevel) {
 
     canalMsg msg;
@@ -122,6 +130,8 @@ receive_event_callback(vscpEvent &ev, void *pobj)
   else {
     spdlog::error("driver: mqtt_on_message - Driver level is not valid (nor 1 nor 2).");
   }
+
+  pthread_mutex_unlock(&pDeviceItem->m_deviceMutex);
 }
 
 
@@ -581,13 +591,18 @@ deviceThread(void *pData)
 
     spdlog::info("{}: [Device tread] Level I Work loop ended.", pDeviceItem->m_strName);
 
+    // Stop MQTT callbacks before closing the driver
+    pDeviceItem->m_bQuit = true;
+    pDeviceItem->m_mqttClient.disconnect();
+
     // Close CANAL channel
+    pthread_mutex_lock(&pDeviceItem->m_deviceMutex);
     pDeviceItem->m_proc_CanalClose(pDeviceItem->m_openHandle);
+    pDeviceItem->m_openHandle = 0;
+    pthread_mutex_unlock(&pDeviceItem->m_deviceMutex);
 
     spdlog::info("{}: [Device tread] Level I Closed.", pDeviceItem->m_strName);
 
-    pDeviceItem->m_bQuit = true;
-    pDeviceItem->m_mqttClient.disconnect();
     dlclose(hdll);
   }
 
@@ -669,13 +684,6 @@ deviceThread(void *pData)
     void *pParent = (void *) pDeviceItem;
     pDeviceItem->m_mqttClient.setCallbackEv(receive_event_callback, pParent);
 
-    // Connect to server
-    if (VSCP_ERROR_SUCCESS != pDeviceItem->m_mqttClient.connect()) {
-      spdlog::error("Failed to connect to MQTT client for level II driver.");
-      dlclose(hdll);
-      return NULL;
-    }
-
     // -------------------------------------------------------------
 
     // Open up the L2 driver
@@ -689,10 +697,21 @@ deviceThread(void *pData)
                                    " There may be additional info from driver "
                                    "in log. If not enable debug flag in drivers config file",
                                    pDeviceItem->m_strName);
+      dlclose(hdll);
       return NULL;
     }
 
     spdlog::debug("{}: [Device tread] Level II Open.", pDeviceItem->m_strName);
+
+    // Connect to server - after open so the receive callback
+    // never sees an invalid driver handle
+    if (VSCP_ERROR_SUCCESS != pDeviceItem->m_mqttClient.connect()) {
+      spdlog::error("Failed to connect to MQTT client for level II driver.");
+      pDeviceItem->m_proc_VSCPClose(pDeviceItem->m_openHandle);
+      pDeviceItem->m_openHandle = 0;
+      dlclose(hdll);
+      return NULL;
+    }
 
     // --------------------------------------------------------------------
     //        Work loop L2 - receive from device - send to MQTT broker
@@ -726,13 +745,17 @@ deviceThread(void *pData)
 
     spdlog::debug("{}: [Device tread] Level II Closing.", pDeviceItem->m_strName);
 
-    // Close channel
-    pDeviceItem->m_proc_VSCPClose(pDeviceItem->m_openHandle);
-
-    spdlog::info("{}: [Device tread] Level II Closed.", pDeviceItem->m_strName);
-
+    // Stop MQTT callbacks before closing the driver
     pDeviceItem->m_bQuit = true;
     pDeviceItem->m_mqttClient.disconnect();
+
+    // Close channel
+    pthread_mutex_lock(&pDeviceItem->m_deviceMutex);
+    pDeviceItem->m_proc_VSCPClose(pDeviceItem->m_openHandle);
+    pDeviceItem->m_openHandle = 0;
+    pthread_mutex_unlock(&pDeviceItem->m_deviceMutex);
+
+    spdlog::info("{}: [Device tread] Level II Closed.", pDeviceItem->m_strName);
 
     // Unload dll
     dlclose(hdll);

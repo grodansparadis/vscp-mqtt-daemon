@@ -38,6 +38,7 @@
 #include <guid.h>
 #include <level2drvdef.h>
 
+#include <atomic>
 #include <deque>
 #include <list>
 #include <map>
@@ -154,10 +155,12 @@ public:
   bool m_bEnable;
 
   // Paused driver is inactive
-  bool m_bActive;
+  // Atomic: written by pause/resume, read by device thread
+  std::atomic<bool> m_bActive;
 
   // termination control
-  bool m_bQuit;
+  // Atomic: written by stopDriver()/device thread, read in work loops
+  std::atomic<bool> m_bQuit;
 
   /*!
       GUID to use for driver interface if set
@@ -168,6 +171,9 @@ public:
   // Worker thread for device
   pthread_t m_deviceThreadHandle;
   pthread_mutex_t m_mutexdeviceThread;
+
+  // True only if m_deviceThreadHandle refers to a started thread
+  bool m_bThreadStarted;
 
   // Device flags for CANAL DLL open
   uint32_t m_DeviceFlags;

@@ -36,6 +36,7 @@
 #include <vscp.h>
 #include <vscpmqtt.h>
 
+#include <atomic>
 #include <map>
 #include <set>
 
@@ -206,7 +207,8 @@ public:
 
 public:
   // Will quit if set to true
-  bool m_bQuit;
+  // Atomic: set from signal handler / other threads, read in main loop
+  std::atomic<bool> m_bQuit;
 
   // User configurable server name
   std::string m_strServerName;
@@ -261,6 +263,10 @@ public:
 
   std::map<std::string, std::string> m_map_discoveryGuidToName; // key = GUID, value = name
 
+  // Protects m_map_discoveryGuidToName, discovery db writes and discovery publish.
+  // discovery() is called concurrently from all device threads.
+  pthread_mutex_t m_mutex_discovery;
+
   //**************************************************************************
   //                                 DRIVERS
   //**************************************************************************
@@ -268,9 +274,6 @@ public:
   // The list with available devices.
   CDeviceList m_deviceList;
   pthread_mutex_t m_mutex_DeviceList;
-
-  // Mutex for device queue
-  pthread_mutex_t m_mutex_deviceList;
 
   //**************************************************************************
   //                            LOGGER (SPDLOG)

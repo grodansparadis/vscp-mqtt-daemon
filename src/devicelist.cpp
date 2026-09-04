@@ -83,6 +83,14 @@ CDeviceItem::CDeviceItem()
   m_bEnable = false; // Default is that driver should not be started
   m_bActive = true;  // Not paused
 
+  m_bThreadStarted = false;
+  m_openHandle     = 0;
+
+  pthread_mutex_init(&m_mutexdeviceThread, NULL);
+  pthread_mutex_init(&m_deviceMutex, NULL);
+  pthread_mutex_init(&m_mutexinputQueue, NULL);
+  sem_init(&m_seminputQueue, 0, 0);
+
   m_translation = NO_TRANSLATION; // Default is no translation
 
   bJsonMeasurementAdd = false;
@@ -134,11 +142,10 @@ CDeviceItem::CDeviceItem()
 
 CDeviceItem::~CDeviceItem(void)
 {
-  /*if ( NULL != m_pDriver3Process ) {
-      m_pDriver3Process->Kill( m_pid );
-      delete m_pDriver3Process;
-      m_pDriver3Process = NULL;
-  }*/
+  sem_destroy(&m_seminputQueue);
+  pthread_mutex_destroy(&m_mutexinputQueue);
+  pthread_mutex_destroy(&m_deviceMutex);
+  pthread_mutex_destroy(&m_mutexdeviceThread);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,6 +225,8 @@ CDeviceItem::startDriver(CControlObject *pCtrlObject)
     return false;
   }
 
+  m_bThreadStarted = true;
+
   spdlog::info("[Driver {}] - Started VSCP device driver.", m_strName);
   return true;
 }
@@ -234,7 +243,10 @@ CDeviceItem::stopDriver()
     spdlog::info("Driver {}: Driver asked to stop operation.", m_strName);
 
     pthread_mutex_lock(&m_mutexdeviceThread);
-    pthread_join(m_deviceThreadHandle, NULL);
+    if (m_bThreadStarted) {
+      pthread_join(m_deviceThreadHandle, NULL);
+      m_bThreadStarted = false;
+    }
     pthread_mutex_unlock(&m_mutexdeviceThread);
 
     spdlog::info("CDeviceItem: Driver stopping. {}\n", m_strName);
