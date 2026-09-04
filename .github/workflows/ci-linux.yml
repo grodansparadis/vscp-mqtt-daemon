@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          deb_file=$(find . -type f -name 'mqttvscpd_*.deb' -print -quit)
+          deb_file=$(find . -type f -name 'mqttvscpd*.deb' -print -quit)
           if [ -z "$deb_file" ]; then
             echo "No Debian package produced" >&2
             exit 1
@@ -81,7 +81,10 @@ jobs:
             *.tar.gz
             *.tgz
             *.zip
+            *.sha256
             build/*.deb
+            build/*.rpm
             build/*.tar.gz
             build/*.tgz
             build/*.zip
+            build/*.sha256

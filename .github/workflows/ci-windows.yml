@@ -68,5 +68,7 @@ jobs:
           path: |
             *.zip
             *.exe
+            *.sha256
             build/*.zip
             build/*.exe
+            build/*.sha256

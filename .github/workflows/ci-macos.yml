@@ -57,6 +57,8 @@ jobs:
             *.tar.gz
             *.tgz
             *.zip
+            *.sha256
             build/*.tar.gz
             build/*.tgz
             build/*.zip
+            build/*.sha256
