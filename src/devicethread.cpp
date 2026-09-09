@@ -49,6 +49,10 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include <algorithm>
+
+#include <spdlog/fmt/bin_to_hex.h>
+
 #include "devicethread.h"
 
 #include <canal-macro.h>
@@ -454,7 +458,7 @@ deviceThread(void *pData)
           // Convert CANAL message to VSCP event
           if (!vscp_convertCanalToEvent(&ev, &msg, (unsigned char *) pDeviceItem->m_guid.getGUID())) {
             spdlog::error("Driver L1: {} Failed to convert CANAL to event.", pDeviceItem->m_strName);
-            break;
+            continue;
           }
           ev.obid     = 0;
           ev.GUID[14] = 0; // Make sure MSB of nickname is zero for Level I driver
@@ -530,9 +534,17 @@ deviceThread(void *pData)
 
               // Convert CANAL message to VSCP event
               if (!vscp_convertCanalToEvent(pev, &msg, (unsigned char *) pDeviceItem->m_guid.getGUID())) {
-                spdlog::error("Driver L1: {} Failed to convet CANAL to event.", pDeviceItem->m_strName);
+                spdlog::error("Driver L1: {} Failed to convert CANAL to event.", pDeviceItem->m_strName);
+                spdlog::trace("Driver L1: {} CANAL msg: id={:X} flags={:X} obid={:X} timestamp={} sizeData={} data=[{:n}]",
+                              pDeviceItem->m_strName,
+                              msg.id,
+                              msg.flags,
+                              msg.obid,
+                              msg.timestamp,
+                              msg.sizeData,
+                              spdlog::to_hex(msg.data, msg.data + std::min<uint8_t>(msg.sizeData, 8)));
                 vscp_deleteEvent_v2(&pev);
-                break;
+                continue;
               }
               pev->obid = 0;
               // pev->GUID[14] = 0;   // Make sure high byte of nickname is zero for Level I driver
@@ -574,7 +586,7 @@ deviceThread(void *pData)
             }
             else {
               spdlog::error("Driver L1: {} Memory problem.\n", pDeviceItem->m_strName);
-              break;
+              continue;
             }
           }
         } // data available
@@ -727,9 +739,9 @@ deviceThread(void *pData)
         continue;
       }
 
-      // If timestamp is zero we set it here
-      if (0 == ev.timestamp) {
-        ev.timestamp = vscp_makeTimeStamp();
+      // If timestamp_ns is zero we set it here
+      if (0 == ev.timestamp_ns) {
+        ev.timestamp_ns = vscp_makeTimeStampNs();
       }
 
       // Publish to MQTT broker
