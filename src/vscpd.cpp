@@ -83,6 +83,10 @@
 
 // #define DEBUG
 
+#if defined(WIN32) && defined(_MSC_VER)
+char *optarg = nullptr;
+#endif
+
 // Globals for the daemon
 int gbStopDaemon;
 bool gbDontRunAsDaemon = false;

@@ -158,6 +158,31 @@ endif()
 install(TARGETS mqttvscpd
     RUNTIME DESTINATION ${MQTTVSCPD_RUNTIME_DESTINATION})
 
+set(MQTTVSCPD_VSCP_RUNTIME_TARGETS
+    vscp_common
+    vscp_core
+    vscp_guid
+    vscp_guidparser
+    vscp_mdf
+    vscp_client_base
+    vscp_client_canal
+    vscp_client_tcp
+    vscp_client_udp
+    vscp_client_ws1
+    vscp_client_ws2
+    vscp_client_multicast
+    vscp_client_mqtt
+    vscp_sockettcp
+    vscp_util)
+
+if(TARGET vscp_client_socketcan)
+    list(APPEND MQTTVSCPD_VSCP_RUNTIME_TARGETS vscp_client_socketcan)
+endif()
+
+install(TARGETS ${MQTTVSCPD_VSCP_RUNTIME_TARGETS}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 install(FILES
     LICENSE
     README.md
