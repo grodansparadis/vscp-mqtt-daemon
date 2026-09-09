@@ -283,7 +283,7 @@ Checks if all 16 bytes of the GUID are zero.
 void setClientID(uint16_t clientid);
 uint16_t getClientID(void);
 ```
-Gets/sets the client ID stored in bytes 12-13 (used by VSCP daemon).
+Gets/sets the client ID stored in bytes 12-13 (used by VSCP MQTT daemon).
 
 ### setNicknameID / getNicknameID
 ```cpp

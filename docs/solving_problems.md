@@ -1,12 +1,12 @@
 # Solving problems and troubleshooting
 
-The VSCP daemon has many parts and a lot of things can go wrong. In this section you can find some tips on how to solve some of the more common ones.
+The VSCP MQTT daemon has many parts and a lot of things can go wrong. In this section you can find some tips on how to solve some of the more common ones.
 
 The VSCP wiki have a [faq](https://github.com/grodansparadis/vscp/wiki/FAQ) that also may be of help.
 
 ## The log file
 
-The vscp daemon writes errors and other  information to the log file. You can set how much information you want in the log file in the configuration file.
+The vscp MQTT daemon writes errors and other  information to the log file. You can set how much information you want in the log file in the configuration file.
 
 | Level | Description |
 | ----- | ----------- |
@@ -17,9 +17,9 @@ The vscp daemon writes errors and other  information to the log file. You can se
 | "critical" | Only critical messages are logged |
 | "off" | No logging |
 
-You can also define a log that log on the console. This is only useful when the VSCP daemon is not run as a service.
+You can also define a log that log on the console. This is only useful when the VSCP MQTT daemon is not run as a service.
 
-The **debug** entry in the configuration file let you set flags to get different debug information from the VSCP Daemon. 
+The **debug** entry in the configuration file let you set flags to get different debug information from the VSCP MQTT daemon. 
 
 The log file is by default located at 
 
@@ -48,7 +48,7 @@ VSCP Level II drivers write debug information to a log file. The log file for a 
 
 ## Config file
 
-One common problem that will stop the VSCP Daemon from running is to have a misconfigured configuration file. This file must be valid JSON and follow the rules. One way to make sure that your configuration file is valid JSON is to use one of the on-line services for this purpose. Just copy the file and paste the content to a site like [this one](https://jsonlint.com/) or [this one](https://jsonformatter.curiousconcept.com/).
+One common problem that will stop the VSCP MQTT daemon from running is to have a misconfigured configuration file. This file must be valid JSON and follow the rules. One way to make sure that your configuration file is valid JSON is to use one of the on-line services for this purpose. Just copy the file and paste the content to a site like [this one](https://jsonlint.com/) or [this one](https://jsonformatter.curiousconcept.com/).
 
 ## If you need help
 

@@ -2,9 +2,9 @@
 
 ![VSCP logo](./images/logo_400.png)
 
-# The VSCP Daemon
+# The VSCP MQTT Daemon
 
-This documentation describe the current version of the VSCP daemon software.
+This documentation describe the current version of the VSCP MQTT daemon software.
 
 ---
 

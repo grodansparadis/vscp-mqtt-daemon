@@ -14,6 +14,12 @@ perl -pi -e "s/(MQTTVSCPD_VERSION_PATCH\s+)\d+/\${1}${patch}/" "${version_file}"
 perl -pi -e "s/(MQTTVSCPD_VERSION_STRING\s+).*/\${1}\"${version}\"/" "${version_file}"
 perl -pi -e "s/(MQTTVSCPD_DISPLAY_VERSION\s+).*/\${1}\"${version}\"/" "${version_file}"
 
+# Keep vcpkg manifest version in sync
+vcpkg_manifest="$(dirname "${version_file}")/../vcpkg.json"
+if [ -f "${vcpkg_manifest}" ]; then
+  perl -pi -e "s/(\"version-string\"\s*:\s*)\"[^\"]*\"/\${1}\"${version}\"/" "${vcpkg_manifest}"
+fi
+
 # Expose the version to GitHub Actions steps
 if [ -n "${GITHUB_ENV:-}" ]; then
   echo "VSCPD_VERSION=${version}" >> "${GITHUB_ENV}"

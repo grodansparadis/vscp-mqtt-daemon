@@ -48,7 +48,7 @@
 					</p>
                     
                     <p>
-                    The VSCP daemon is documented <a href="http://www.vscp.org/docs/vscpd/doku.php"  target="go">here</a>.
+                    The VSCP MQTT daemon is documented <a href="http://www.vscp.org/docs/vscpd/doku.php"  target="go">here</a>.
                     </p>
                     
                     <p>
@@ -135,7 +135,7 @@
 					height="385"></embed></object>
 					</p>
 					
-					<p>This is a demo on VSCP daemon (server) functionality.</p>
+					<p>This is a demo on VSCP MQTT daemon (server) functionality.</p>
 					
 					<p>
 					<object width="480" height="385"><param name="movie" 

@@ -1,6 +1,6 @@
 # Server subscriptions
 
-A driver can subscribe to any number of topics. At least as long as the broker and the computer that runs the VSCP daemon can handle it.
+A driver can subscribe to any number of topics. At least as long as the broker and the computer that runs the VSCP MQTT daemon can handle it.
 
 Server subscriptions work in the same way as [driver subscriptions](./subscribe_driver.md) so read the information in that document as well.
 

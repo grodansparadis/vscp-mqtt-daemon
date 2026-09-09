@@ -16,7 +16,7 @@ The configuration string has the following format
 
 ##### NumberOfSensors
 
-The parameter *NumberOfSensors* (which is optional) is the number of sensors the driver should report data from. This value can also be available as a VSCP daemon variable and if both are present the VSCP daemon variable will be used. Default is 1. 
+The parameter *NumberOfSensors* (which is optional) is the number of sensors the driver should report data from. This value can also be available as a VSCP MQTT daemon variable and if both are present the VSCP MQTT daemon variable will be used. Default is 1. 
 
  | Variable name    | Type    | Description  | 
  | -------------    | ----    | -----------  | 

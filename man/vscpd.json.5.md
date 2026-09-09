@@ -1,17 +1,17 @@
-% vscpd.json(5) VSCP Daemon configuration file
+% vscpd.json(5) VSCP MQTT daemon configuration file
 % Åke Hedman, the VSCP project
 % January 20, 2020
 
 # NAME
 
-vscpd.json - VSCP Daemon configuration file
+vscpd.json - VSCP MQTT daemon configuration file
 
 # SYNOPSIS
 
 /etc/vbscp/vscpd.json
 
 # DESCRIPTION
-The configuration file for the VSCPD daemon is a XML based file that set up the different functionalities of the VSCP daemon.
+The configuration file for the VSCPD MQTT daemon is a XML based file that set up the different functionalities of the VSCP MQTT daemon.
 
 # SEE ALSO
 

@@ -1,8 +1,8 @@
 # Server publishing
 
-The VSCP daemon publish events from several points. First the daemon itself publish events. and then each driver connected to the VSCP daemon publish events.
+The VSCP MQTT daemon publish events from several points. First the daemon itself publish events. and then each driver connected to the VSCP MQTT daemon publish events.
 
-The VSCP daemon publish start up information, information about drivers and heart beat and information events.
+The VSCP MQTT daemon publish start up information, information about drivers and heart beat and information events.
 
 ### Topics
 
@@ -106,13 +106,13 @@ Valid escapes are
 
 | Escape | Description |
 | ------ | ----------- |
-| {{srvguid}} | GUID for the VSCP daemon server. |
-| {{srvguid.msb}} | Most significant byte of GUID for the VSCP daemon server in decimal |
-| {{srvguid.lsb}} | Least significant byte of GUID for the VSCP daemon server in decimal |
-| {{xsrvguid.msb}} | Most significant byte of GUID for the VSCP daemon server in hexadecimal |
-| {{xsrvguid.lsb}} | Least significant byte of GUID for the VSCP daemon server in hexadecimal |
-| {{srvguid[0..15]}} | Specified byte of GUID 0-15 for the VSCP daemon server in decimal |
-| {{xsrvguid[0..15]}} | Specified byte of GUID 0-15 for the VSCP daemon server in hexadecimal |
+| {{srvguid}} | GUID for the VSCP MQTT daemon server. |
+| {{srvguid.msb}} | Most significant byte of GUID for the VSCP MQTT daemon server in decimal |
+| {{srvguid.lsb}} | Least significant byte of GUID for the VSCP MQTT daemon server in decimal |
+| {{xsrvguid.msb}} | Most significant byte of GUID for the VSCP MQTT daemon server in hexadecimal |
+| {{xsrvguid.lsb}} | Least significant byte of GUID for the VSCP MQTT daemon server in hexadecimal |
+| {{srvguid[0..15]}} | Specified byte of GUID 0-15 for the VSCP MQTT daemon server in decimal |
+| {{xsrvguid[0..15]}} | Specified byte of GUID 0-15 for the VSCP MQTT daemon server in hexadecimal |
 | {{guid}} | GUID for the event |
 | {{guid.msb}} | Most significant byte of GUID for the event in decimal |
 | {{guid.lsb}} | Least significant byte of GUID for the event in decimal |

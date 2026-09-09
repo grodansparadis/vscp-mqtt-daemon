@@ -25,7 +25,7 @@ The configuration string has the following format
 
 ##### NumberOfNodes
 
-The parameter *NumberOfNodes* (which is optional) is the number of simulated devices the driver should report data from. Sensors will be assigned in the order they are started so nicknames will be 1,2,3 etc.   This value can also be set as a VSCP daemon variable and if both are present the VSCP daemon variable will be used. __Default is 1.__ 
+The parameter *NumberOfNodes* (which is optional) is the number of simulated devices the driver should report data from. Sensors will be assigned in the order they are started so nicknames will be 1,2,3 etc.   This value can also be set as a VSCP MQTT daemon variable and if both are present the VSCP MQTT daemon variable will be used. __Default is 1.__ 
 
  | Variable name  | Type    | Description | 
  | -------------           | ----    | ----------- | 

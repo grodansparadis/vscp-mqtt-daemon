@@ -213,7 +213,7 @@ public:
   // User configurable server name
   std::string m_strServerName;
 
-  // VSCP daemon root folder
+  // VSCP MQTT daemon root folder
   std::string m_rootFolder;
 
   /*!
@@ -312,17 +312,17 @@ public:
   json m_mqttConfig;
 
   /*!
-   Base topic for VSCP daemon info. Should end with slash
+   Base topic for VSCP MQTT daemon info. Should end with slash
  */
   std::string m_topicDaemonBase;
 
   /*!
-    Topic under daemon base which the dameon publish it's drivers
+    Topic under daemon base which the MQTT daemon publish it's drivers
     Default is 'daemon-base'/drivers
   */
   std::string m_topicDrivers;
   /*!
-    Topic under daemon base on which the dameon publish it's new node discoveries
+    Topic under daemon base on which the MQTT daemon publish it's new node discoveries
     Default is 'daemon-base'/discovery
   */
   std::string m_topicDiscovery;

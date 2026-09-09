@@ -26,7 +26,7 @@
 // SOFTWARE.
 //
 
-// * * * VSCP daemon debug flags (64 flags)
+// * * * VSCP MQTT daemon debug flags (64 flags)
 #define VSCP_DEBUG_NONE             0x0000000000000000
 #define VSCP_DEBUG_ALL              0xFFFFFFFFFFFFFFFF
 #define VSCP_DEBUG_EXTRA            (1 << 0)    // 1 Verbose info

@@ -18,7 +18,7 @@ The **configuration string** has the following format
 
 ##### NumberOfSensors
 
-The parameter *NumberOfSensors* (which is optional) is the number of sensors the driver should report data from. This value can also be available as a VSCP daemon variable and if both are present the VSCP daemon variable will be used. 
+The parameter *NumberOfSensors* (which is optional) is the number of sensors the driver should report data from. This value can also be available as a VSCP MQTT daemon variable and if both are present the VSCP MQTT daemon variable will be used. 
 
  | Variable name     | Type    | Description | 
  | -------------     | ----    | ----------- | 
@@ -230,7 +230,7 @@ and it is normally installed in */usr/local/bin*
 
 The documentation for it is in the specification document 30.3
 
-You need to have a driver entry in the  VSCP daemon configuration file located at /etc/vscp/vscpd.json. These entries looks like
+You need to have a driver entry in the  VSCP MQTT daemon configuration file located at /etc/vscp/vscpd.json. These entries looks like
 
 ```xml	
 <driver enable="true" >
@@ -420,7 +420,7 @@ In version 0.4.0 Fluorine, which is the active version when this is written, the
 
 VSCP is an event based system so when something happens an event is sent and can be received. Most of the time this is just a good thing. Sometimes it can be less good. Think for instance of a situation where you start up a system and want to display the current state of things. Before you get any events from the things you monitor you can't tell there state. There are two solutions on this. Either you have to ask the state or you have something in between that does that for you. 
 
-This is a case when VSCP daemon variables is very good. When an event comes in you store it in a variable instead and then in your presentation interface you read that variable instead of the event. The websocket interface allowes you to read variables
+This is a case when VSCP MQTT daemon variables is very good. When an event comes in you store it in a variable instead and then in your presentation interface you read that variable instead of the event. The websocket interface allowes you to read variables
 
 Easiest way to do this is to use the internal web-interface of the VCSP daemon. Select **Configuration/Variable -new** and fill in the data
 
@@ -428,7 +428,7 @@ Easiest way to do this is to use the internal web-interface of the VCSP daemon. 
 
 Of course if you rather prefer to write in the information in the configuration file yourself you can do that to. Its by default located at **/etc/vscp/dm.conf** and the format is specified in the VSCP specification document section 16.16.7.
 
-The VSCP daemon internal decision matrix functionality is described in the VSCP specification document section 14.7  The functionality of it in short is that if an event comes in an meet certain criteria the VSCP daemon does an action, in this case store the event in a variable.
+The VSCP MQTT daemon internal decision matrix functionality is described in the VSCP specification document section 14.7  The functionality of it in short is that if an event comes in an meet certain criteria the VSCP MQTT daemon does an action, in this case store the event in a variable.
 
 **Group id** is a way to group DM entries together. We have no need for this functionality now so we just enter a name here. 
 
@@ -461,7 +461,7 @@ So what about the action-parameter, **oxygen-cpucore0,1,true,"%event"**. What do
 
 You now know how to take care of variables in the decision matrix of the daemon so you can log data to a database, send them to other sources, or as we did above store them in variables.
 
-It would have been very nice to show them on a web page. The best way to do this is to use the websocket interface of the VSCP daemon. It is described in section 14.9 of the VSCP specification. 
+It would have been very nice to show them on a web page. The best way to do this is to use the websocket interface of the VSCP MQTT daemon. It is described in section 14.9 of the VSCP specification. 
 
 We can do this in two variants to show the power of this interface. First we show values in widgets that really looks like a thermometer and is dynamically updated and the as a textual representation that can be anywhere in the flow of a web-page and still be dynamic, live and nice.
 
@@ -553,7 +553,7 @@ And for the other cpu
 	                    "FF:FF:FF:FF:FF:FF:00:00:00:00:00:00:00:00:00:02");
 ```
 
-**VSCP_WEBSOCKET_URL** is the url for the machine where the VSCP daemon is running. On my machine this is `"ws://192.168.1.20:7681"` note the "**ws**" instead of http/https  
+**VSCP_WEBSOCKET_URL** is the url for the machine where the VSCP MQTT daemon is running. On my machine this is `"ws://192.168.1.20:7681"` note the "**ws**" instead of http/https  
 
 **"cpu0"** and **"cpu1"** refers to the respective positions in the table where the values should be put. 
 

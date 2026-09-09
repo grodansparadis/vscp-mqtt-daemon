@@ -1,24 +1,24 @@
-# Configuring the VSCP Daemon
+# Configuring the VSCP MQTT Daemon
 
-The configuration file is used to tell which drivers should be used and how the VSCP daemon should operate. From version 15.0 this file has changed format from XML to JSON.
+The configuration file is used to tell which drivers should be used and how the VSCP MQTT daemon should operate. From version 15.0 this file has changed format from XML to JSON.
 
 As always with configuration files it easy to make changes that make the system nonfunctional. So be careful when you edit the file and keep to the JSON standard. Most important keep a backup so that yo can go back to a working copy if something goes wrong.
 
 It is very convenient to use one of the online JSON validators to validate the JSON file when doing a lot of changes. There are many available and a good one is [this one](https://jsonformatter.curiousconcept.com/). Just copy the content of the file in the box and validate.
 
-When you change something in the configuration file you have to restart the VSCP daemon for the changes to take effect. You do this with
+When you change something in the configuration file you have to restart the VSCP MQTT daemon for the changes to take effect. You do this with
 
 ```bash
 sudo systemctl restart vscpd
 ```
 
-If something is wrong the VSCP daemon may not start. Check the log file at **/var/log/mqttvscpd.log**. You can also use
+If something is wrong the MQTT VSCP MQTT daemon may not start. Check the log file at **/var/log/mqttvscpd.log**. You can also use
 
 ```bash
 ps aux | grep vscpd
 ```
 
-to see if the VSCP daemon is running or not.
+to see if the VSCP MQTT daemon is running or not.
 
 The sample configuration file that is installed holds a lot of information. You can use defaults for most of it. A minimum configuration file looks like this
 
@@ -27,7 +27,7 @@ The sample configuration file that is installed holds a lot of information. You 
   "runasuser": "vscp",
   "debug": 0,
   "guid": "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
-  "servername": "The VSCP daemon on HOST",
+  "servername": "The VSCP MQTT daemon on HOST",
   "classtypedb": "/var/lib/vscp/vscpd/vscp_events.sqlite3",
   "maindb": "/var/lib/vscp/vscpd/vscp.sqlite3",
   "discoverydb": "/var/lib/vscp/vscpd/vscp.sqlite3",
@@ -73,7 +73,7 @@ The sample configuration file that is installed holds a lot of information. You 
       "topic": "vscp-daemon/status/will/",
       "qos": 1,
       "retain": true,
-      "payload": "VSCP Daemon is down"
+      "payload": "VSCP MQTT Daemon is down"
     },
     "subscribe": [
       {
@@ -101,7 +101,7 @@ The daemon needs a configuration file called **vscpd.json**. The server will not
 
 On most machines the configuration file will be located in 
 
-    /etc/vscp/vscpd.json
+    /etc/vscp/mqttvscpd.json
     
 The location that is searched to find the configuration file can be changed with switches when you start the daemon. see the section about [startup switches](http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_startup_switches) for each platform.
 
@@ -109,11 +109,11 @@ The location that is searched to find the configuration file can be changed with
 
 ### GUID's :id=think-before-guid
 
-GUID's stands for **G**lobally **U**nique **ID**entifiers and this id is used in VSCP to identify thing. All devices and nodes are identified by a GUID but so is also the VSCP daemon (it is after all a node to) and each of the drivers connected to the server. Check the [VSCP specification](https://docs.vscp.org/#vscpspec) for more information about GUID's.
+GUID's stands for **G**lobally **U**nique **ID**entifiers and this id is used in VSCP to identify thing. All devices and nodes are identified by a GUID but so is also the VSCP MQTT daemon (it is after all a node to) and each of the drivers connected to the server. Check the [VSCP specification](https://docs.vscp.org/#vscpspec) for more information about GUID's.
 
 The daemon needs a GUID assigned to it. Preferably a unique one. It is possible to base a GUID on the machines MAC address if it have an ethernet interface. There is also other id's to build upon. One can also ask for a personal assigned series. See [the VSCP specification](https://docs.vscp.org/#vscpspec) for more info on how.
 
-For most users the MAC address of the machine the VSCP daemon is installed on is the best solution. The installation package will even install a helper script on Linux that help you create this GUID. The script is called **vscp_eth_tp_guid**. To used it you need the name of your ethernet interface. You can get that with
+For most users the MAC address of the machine the VSCP MQTT daemon is installed on is the best solution. The installation package will even install a helper script on Linux that help you create this GUID. The script is called **vscp_eth_tp_guid**. To used it you need the name of your ethernet interface. You can get that with
 
 ```bash
 ip link show
@@ -132,19 +132,19 @@ and the distributed demo GUID's set in the standard file will all be changed.
 
 ##  Description of the configuration :id=config-description
 
-The configuration file is a standard JSON file that contains information that tells the VSCP daemon what to do and how it should be done. The information in it is divided into sections and this documentation and each section and it's content is described below.
+The configuration file is a standard JSON file that contains information that tells the VSCP MQTT daemon what to do and how it should be done. The information in it is divided into sections and this documentation and each section and it's content is described below.
 
 You can view a sample configuration file [here](https://github.com/grodansparadis/vscp/blob/master/resources/linux/vscpd.json).
 
 ## The general section :id=config-general
 
-In the general section you find settings that are common to all components of the VSCP daemon software. 
+In the general section you find settings that are common to all components of the VSCP MQTT daemon software. 
 
 ```json
 "runasuser" : "vscp",	
 "debug" : 0,	
 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
-"servername" : "The VSCP daemon on HOST",
+"servername" : "The VSCP MQTT daemon on HOST",
 "classtypedb" : "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3",
 "maindb" : "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
 "discoverydb" : "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
@@ -198,7 +198,7 @@ In the general section you find settings that are common to all components of th
       "topic": "vscp-daemon/status/{{srvguid}}/will",
       "qos": 1,
       "retain": true,
-      "payload": "VSCP Daemon is down"
+      "payload": "VSCP MQTT Daemon is down"
     },
     "subscribe": [
       {
@@ -224,9 +224,9 @@ this will start up the daemon but do noting. You need to add a driver to get som
 
 ### runasuser :id=config-general-runasuser
 
-__Only on Unix/Linux__. User to run the VSCP daemon as. This is for security and folders for VSCP & friends are set up with permissions for a vscp user on install. By running on this user it is no need to run the VSCP daemon as the root user.
+__Only on Unix/Linux__. User to run the VSCP MQTT daemon as. This is for security and folders for VSCP & friends are set up with permissions for a vscp user on install. By running on this user it is no need to run the VSCP MQTT daemon as the root user.
 
-Change to the user you want or set to empty to run as the user who starts the VSCP daemon.
+Change to the user you want or set to empty to run as the user who starts the VSCP MQTT daemon.
 
 
 ### guid :id=config-general-guid
@@ -250,14 +250,14 @@ If not set here (or all nills) a GUID will be formed from the (first) MAC addres
 
 If set this real text name will be used as an identifier for the server along with the GUID. The default name will be something like
 
-    The VSCP Daemon
+    The VSCP MQTT Daemon
 
 but you should set this to an id that make it easy to identify your server as it will be published to the MQTT server you setup at the topic mqttvscp-daemon/{{guid}} where {{guid}} is [the guid you used for the daemon](#config-general-guid).
 
 ### classtypedb :id=config-general-classtypedb
-This is a path to a sqlite3 database file that holds information about VSCP events and can give symbolic output from the VSCP daemon. You can for instance have topics that display class or type as token instead of the numerical code. Live this entry blank if you have no interest in this.
+This is a path to a sqlite3 database file that holds information about VSCP events and can give symbolic output from the VSCP MQTT daemon. You can for instance have topics that display class or type as token instead of the numerical code. Live this entry blank if you have no interest in this.
 
-Events are added to the VSCP specification as times go by. The database installed with the VSCP daemon is the current at the moment of the release. If you want to update you can find the latest version [here](https://www.vscp.org/events/vscp_events.sqlite3). Update information is [here](https://www.vscp.org/events/version.json). 
+Events are added to the VSCP specification as times go by. The database installed with the VSCP MQTT daemon is the current at the moment of the release. If you want to update you can find the latest version [here](https://www.vscp.org/events/vscp_events.sqlite3). Update information is [here](https://www.vscp.org/events/version.json). 
 
 Load the latest file with
 
@@ -267,12 +267,12 @@ sudo wget https://www.vscp.org/events/vscp_events.sqlite3
 ```
 
 ### maindb :id=config-general-maindb
-THis is the main database file for the VSCP daemon. It's main content is the discovery database which is used to collect information about nodes in the system. 
+THis is the main database file for the VSCP MQTT daemon. It's main content is the discovery database which is used to collect information about nodes in the system. 
 
 This entry must point to a named file in a location that is writable (default is _/var/lib/vscp/vscpd/vscp.sqlite3_)
 
 ### vscpkey :id=config-general-vscpkey
-This is the path to a security key that the VSCP daemon use to encrypt/decrypt information with. The default is _/var/vscp/vscp.key_ This file should only be editable by the root user and also not be possible to read by any one else.
+This is the path to a security key that the VSCP MQTT daemon use to encrypt/decrypt information with. The default is _/var/vscp/vscp.key_ This file should only be editable by the root user and also not be possible to read by any one else.
 
 ### debuglevel :id=config-general-debug-level
 This is the debug level. Zero is no debugging. A higher number is different levels of debugging detail.
@@ -390,7 +390,7 @@ UDP port to send log messages to. Default is 9999
 ----
 ##  MQTT :id=config-mqtt
 
-This is the main MQTT settings of the VSCP daemon. This is where interface and discovery information will be published. Also subscribe topics are here for server information and commands.
+This is the main MQTT settings of the VSCP MQTT daemon. This is where interface and discovery information will be published. Also subscribe topics are here for server information and commands.
 
 Main MQTT settings are derived by drivers and other parts of the system from here. There is no need to repeat information that is the same. Typically a driver, for example, will only differ in subscribe and publish tropics.
 
@@ -474,7 +474,7 @@ Set the client id of this client. Note that **all client id's should be unique t
 From version 15.0.3 you can use {{rnd}} in the client name to get a random 16 hex character string generated for the mustache tag. 
 
 ### publish-format :id=config-mqtt-general-publish-format
-This is the format the VSCP daemon will use to publish it's information if not set specially for the publish topic. There are four formats available
+This is the format the VSCP MQTT daemon will use to publish it's information if not set specially for the publish topic. There are four formats available
 
 | Format | Description |
 | ------ | ----------- |
@@ -486,11 +486,11 @@ This is the format the VSCP daemon will use to publish it's information if not s
 Default is *json*.
 
 ### subscribe-format :id=config-mqtt-general-subscribe-format
-This is the format the VSCP daemon will expect subscriptions to ne formatted if not set specially for the subscribe topic. There are five formats available
+This is the format the VSCP MQTT daemon will expect subscriptions to ne formatted if not set specially for the subscribe topic. There are five formats available
 
 | Format | Description |
 | ------ | ----------- |
-| auto | The VSCP daemon will try to detect the payload format. |
+| auto | The VSCP MQTT daemon will try to detect the payload format. |
 | json | JSON formatted payload will be expected. |
 | xml  | XML formatted paylaod will be expected. |
 | string | Comma separated string formatted payload will be expected. |
@@ -528,7 +528,7 @@ If set to true published VSCP will get the measurement JSON data added to the ev
 ### topic-daemon-base :id=config-mqtt-topic-daemon-base
 This is the first part of the base topic and it will be prefix for other topics such as *drivers* and *discovery*.
 
-The VSCP daemon will publish some information under this topic.
+The VSCP MQTT daemon will publish some information under this topic.
 
 Default is *vscp-daemon({{guid}}/*
 
@@ -629,7 +629,7 @@ A limited set of escapes are available for will-topics. You can use {{srvguid}} 
 | clientid | Clientid for the MQTT session. |
 | user | User name for the MQTT session.|
 | host | Remote host for the MQTT session. |
-| srvguid | Full GUID for the VSCP daemon |
+| srvguid | Full GUID for the VSCP MQTT daemon |
 | srvguid[n] | One pos in decimal for server GUID for daemon. n can be 0..15 where 0 is most significant byte. |
 | xsrvguid[n] | One pos in hexadecimal for server GUID for daemon. n can be 0..15 where 0 is most significant byte. |
 | ifguid | Full GUID for the interface (= GUID for driver). Valid only for drivers. |
@@ -642,7 +642,7 @@ A limited set of escapes are available for will-topics. You can use {{srvguid}} 
     "topic": "vscp-daemon/{{srvguid}}/will",
     "qos": 1,
     "retain": true,
-    "payload": "VSCP Daemon is down"
+    "payload": "VSCP MQTT Daemon is down"
 },
 ```
 
@@ -660,7 +660,7 @@ Payload to use for will. Default is _VSCP Daemon is down_
 
 ### **subscribe** :id=config-mqtt-subscribe
 
-This an array of topics on which the VSCP daemon will get it's incoming VSCP events. You can specify as many as you like.  Mustache escapes (escape tokens within {{_token_}}) can be used to create dynamic topics.
+This an array of topics on which the VSCP MQTT daemon will get it's incoming VSCP events. You can specify as many as you like.  Mustache escapes (escape tokens within {{_token_}}) can be used to create dynamic topics.
 
 ```json
 "subscribe": [
@@ -707,7 +707,7 @@ If not set the [config-mqtt-subscribe-format](#config-mqtt-general-subscribe-for
 
 | Format | Description |
 | ------ | ----------- |
-| auto | The VSCP daemon will try to detect the payload format. |
+| auto | The VSCP MQTT daemon will try to detect the payload format. |
 | json | JSON formatted payload will be expected. |
 | xml  | XML formatted paylaod will be expected. |
 | string | Comma separated string formatted payload will be expected. |
@@ -735,7 +735,7 @@ Here any number of key/value pairs can be defined.
 
 ### publish :id=config-mqtt-publish
 
-This is an array of topics which the VSCP daemon will subscribe to. You can specify as many as you like. Mustache escapes (escape tokens within {{_token_}}) can be used to create dynamic topics. The topic is created just before the event is published. The following escapes are valid for publish topics
+This is an array of topics which the VSCP MQTT daemon will subscribe to. You can specify as many as you like. Mustache escapes (escape tokens within {{_token_}}) can be used to create dynamic topics. The topic is created just before the event is published. The following escapes are valid for publish topics
 
 ``` json
 "publish": [
@@ -831,7 +831,7 @@ and so on.
 
 ##  Level I Drivers :id=config-level1-driver
 
-Define a VSCP daemon level I driver. If enabled the driver will be loaded. 
+Define a VSCP MQTT daemon level I driver. If enabled the driver will be loaded. 
 
 Level I drivers was in the past called CANAL (CAN Abstraction Layer) drivers (just because they are).
 

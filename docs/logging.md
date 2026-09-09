@@ -1,6 +1,6 @@
 # Logging
 
-System messages like errors, warnings and notifications from the VSCP daemon is logged to syslog. This means you can find this information in the syslog file
+System messages like errors, warnings and notifications from the VSCP MQTT daemon is logged to syslog. This means you can find this information in the syslog file
 
     /var/log/syslog
 

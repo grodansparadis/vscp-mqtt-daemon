@@ -1,6 +1,6 @@
 # Security
 
-Security is very important in VSCP and so also of course in the VSCP daemon. Still much of it has been put aside during the development of VSCP & Friends. The reason is that the subject of security is difficult and hard and need  a lot of thought before it is deployed. But now from version 1.13 of the package security will be implemented in all areas of the framework.
+Security is very important in VSCP and so also of course in the VSCP MQTT daemon. Still much of it has been put aside during the development of VSCP & Friends. The reason is that the subject of security is difficult and hard and need  a lot of thought before it is deployed. But now from version 1.13 of the package security will be implemented in all areas of the framework.
 
 ## Encryption key
 

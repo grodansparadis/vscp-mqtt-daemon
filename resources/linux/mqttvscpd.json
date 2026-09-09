@@ -1,7 +1,7 @@
 {
   "runasuser": "vscp",
   "guid": "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
-  "servername": "The VSCP daemon TEST at HOST",
+  "servername": "The VSCP MQTT daemon TEST at HOST",
   "classtypedb": "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3",
   "maindb": "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
   "discoverydb": "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
@@ -73,7 +73,7 @@
       "topic": "vscp-daemon/{{guid}}/will",
       "qos": 1,
       "retain": true,
-      "payload": "VSCP Daemon HOST is down"
+      "payload": "VSCP MQTT Daemon HOST is down"
     },
     "subscribe": [
       {

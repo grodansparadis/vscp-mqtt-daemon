@@ -1,9 +1,9 @@
-# VSCP Daemon Widgets and Javascript library
+# VSCP MQTT Daemon Widgets and Javascript library
 
 
-To make it easier to use the websocket interface of the daemon a number of widgets that makes it easier to create dynamic HTML5 web pages has been developed. Also a general JavaScript library is available that both help in developing and interfacing the VSCP websocket interface of the VSCP daemon.
+To make it easier to use the websocket interface of the daemon a number of widgets that makes it easier to create dynamic HTML5 web pages has been developed. Also a general JavaScript library is available that both help in developing and interfacing the VSCP websocket interface of the VSCP MQTT daemon.
 
-When you create websocket applications using the internal web server of the VSCP daemon you should always disable the cache for the pages you create with
+When you create websocket applications using the internal web server of the VSCP MQTT daemon you should always disable the cache for the pages you create with
 
    `<!-- Don't cache the page -->`
    `<META HTTP-EQUIV="Pragma" CONTENT="no-cache">`

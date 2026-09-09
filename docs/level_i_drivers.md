@@ -1,4 +1,4 @@
-# VSCP Daemon Level I Drivers
+# VSCP MQTT Daemon Level I Drivers
 
 ![](./images/level1-driver.png)
 
@@ -8,9 +8,9 @@ The driver is just a shared library, a .dll (Windows) or a .so (Linux) file with
 
 Many ready to use Level I drivers are available for VSCP & Friends. A list of drivers can be found [here](https://docs.vscp.org/#level1drv). Documentation, usage and install instructions can be found by going to each drivers repository.
 
-The good thing with the Level I interface is that you can add the .dll or .so as a driver for use with the VSCP daemon or use the dll/so directly from your own application such as in [VSCP Works](https://docs.vscp.org/#vscpworks).
+The good thing with the Level I interface is that you can add the .dll or .so as a driver for use with the VSCP MQTT daemon or use the dll/so directly from your own application such as in [VSCP Works](https://docs.vscp.org/#vscpworks).
 
-The drivers to use with the VSCP daemon is configured in the vscpd.json file ([format for the configuration](./configuring_the_vscp_daemon.md#config-drivers)). 
+The drivers to use with the VSCP MQTT daemon is configured in the vscpd.json file ([format for the configuration](./configuring_the_vscp_daemon.md#config-drivers)). 
 
 To make your own Level I driver just create a dynamically linked library that export the CANAL interface. There are plenty of examples to use as a starting point for creating your own driver in the [source tree for the VSCP & Friends package at GitHub](https://github.com/grodansparadis?tab=repositories&q=vscpl1drv&type=&language=). 
 

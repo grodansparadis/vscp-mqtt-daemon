@@ -12,7 +12,7 @@ See documentation for each driver.
 
 # DESCRIPTION
 
-There are many Level I drivers available in VSCP & Friends framework that can be used with both VSCP Works and the VSCP Daemon and added to that Level II and Level III drivers that can be used with the VSCP Daemon.
+There are many Level I drivers available in VSCP & Friends framework that can be used with both VSCP Works and the VSCP MQTT daemon and added to that Level II and Level III drivers that can be used with the VSCP MQTT Daemon.
 
 Level I drivers is documented [here](https://grodansparadis.gitbooks.io/the-vscp-daemon/level_i_drivers.html).
 

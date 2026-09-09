@@ -1,10 +1,10 @@
 # Setting up the System
 
-The VSCP Daemon is easy to setup. Just install the server and then configure the drivers you want to use. It is recommended to set up a local MQTT broker also but one can use one of the [public MQTT brokers](https://mntolia.com/10-free-public-private-mqtt-brokers-for-testing-prototyping/) for testing. Mosquitto is a very populöar choice that we recommend.
+The VSCP MQTT Daemon is easy to setup. Just install the server and then configure the drivers you want to use. It is recommended to set up a local MQTT broker also but one can use one of the [public MQTT brokers](https://mntolia.com/10-free-public-private-mqtt-brokers-for-testing-prototyping/) for testing. Mosquitto is a very populöar choice that we recommend.
 
 ## Setting up the system on Linux
 
-To install the VSCP daemon on Linux/Unix you need to install the binary package or build the system from source. The build process is simple and it usually don't give any problems. You can find the latest binaries and source files [here](https://github.com/grodansparadis/vscp/releases)
+To install the VSCP MQTT daemon on Linux/Unix you need to install the binary package or build the system from source. The build process is simple and it usually don't give any problems. You can find the latest binaries and source files [here](https://github.com/grodansparadis/vscp/releases)
 
 ### Installing from binary package (preferred install method)
 
@@ -24,7 +24,7 @@ When this is written the 15.0.0 release is the latest and the Debian package is 
 
 after downloading the file.
 
-When you have installed the package you can enable and start the VSCP daemon with
+When you have installed the package you can enable and start the VSCP MQTT daemon with
 
 ```bash
 systemctl enable vscpd
@@ -41,7 +41,7 @@ Now read the section about configuring your system.
 
 **Note:** Use only for testing for now!!!!
 
-The VSCP project also have a private package repository which currently is experimental. The repository holds files for amd64/i385/armhf that should work on all debian derived systems such as Ubuntu and Raspbian as well as on Debian itself. The repository holds all drivers, the VSCP daemon and many other packages.
+The VSCP project also have a private package repository which currently is experimental. The repository holds files for amd64/i385/armhf that should work on all debian derived systems such as Ubuntu and Raspbian as well as on Debian itself. The repository holds all drivers, the VSCP MQTT daemon and many other packages.
 
 To use it you must add a signing key to your apt install system. You do this with
 
@@ -183,7 +183,7 @@ to start the service
 
 ## Setting up the system on Rasperry Pi
 
-The [Raspberry Pi](https://www.raspberrypi.org/) is a very nice single board computer and a perfect match for VSCP & Friends. __The VSCP daemon should work on all Raspberry Pi's except the RPi1 with 256 MB memory where the SSL lib probably fails due to out of memory.__ 
+The [Raspberry Pi](https://www.raspberrypi.org/) is a very nice single board computer and a perfect match for VSCP & Friends. __The VSCP MQTT daemon should work on all Raspberry Pi's except the RPi1 with 256 MB memory where the SSL lib probably fails due to out of memory.__ 
 
 If the startup script does not work or if you experience other startup problems you may need to update the firmware of your Raspberry Pi with **rpi-update**
 
@@ -202,7 +202,7 @@ VSCP & Friends has been tested and works very well on Beaglebone Black. The setu
 
 ## Setting up the system on Windows
 
-The VSCP daemon is not (yet) available on Windows. You can however use Windows Subsystem for Linux (WSL) to run it if you like. With the system installed follow the Linux install instructions. The main problem is that the daemon is not yet available as a service on Windows. This is something that will be added in the future. However the VSCP daemon compiles and runs just fine on windows.
+The VSCP MQTT daemon is not (yet) available on Windows. You can however use Windows Subsystem for Linux (WSL) to run it if you like. With the system installed follow the Linux install instructions. The main problem is that the daemon is not yet available as a service on Windows. This is something that will be added in the future. However the VSCP MQTT daemon compiles and runs just fine on windows.
 
 ### Compile and run on Windows
 
@@ -213,7 +213,7 @@ mkdir build
 cd build
 ```
 
-If vcpkg is installed on the G: drive and the vcpkg triplet is x64-windows the following cmake commands can be used to compile the VSCP daemon on Windows.
+If vcpkg is installed on the G: drive and the vcpkg triplet is x64-windows the following cmake commands can be used to compile the VSCP MQTT daemon on Windows.
 
 ```bash
 cmake .. -G "Visual Studio 18 2026" -DVCPKG_TARGET_TRIPLET=x64-windows  -D CMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=G:\vcpkg\scripts\buildsystems\vcpkg.cmake
@@ -408,7 +408,7 @@ The current version 15.0 is not (yet) available on Windows. You can however use 
 
 From this version MQTT is central and the vscp server **must have** a MQTT broker to function. Initial configurations files use the Mosquitto test server (test.mosquitto.org:1883) which is open and free to use for testing. There are other [free and open brokers](https://mntolia.com/10-free-public-private-mqtt-brokers-for-testing-prototyping/) available for test. In a full production environment you should almost always setup your own broker or subscribe to some of the brokers that are available (such as the ones in the lin above).
 
-To test, debug and do work with the vscp daemon server you also need a MQTT client. We use the [VSCP Works tool](https://github.com/grodansparadis/vscp-works-qt) for much of our work. This tool is currently being rewritten and MQTT support and other functionality is added as time goes.
+To test, debug and do work with the vscp MQTT daemon server you also need a MQTT client. We use the [VSCP Works tool](https://github.com/grodansparadis/vscp-works-qt) for much of our work. This tool is currently being rewritten and MQTT support and other functionality is added as time goes.
 
 For development we use the Mosquitto client tools. The main tools we use are [mosquitto_pub](https://mosquitto.org/man/mosquitto_pub-1.html) and [mosquitto_sub](https://mosquitto.org/man/mosquitto_sub-1.html). On a debian based system you can install them with
 

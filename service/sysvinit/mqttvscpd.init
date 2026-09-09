@@ -6,7 +6,7 @@
 # Required-Stop:	$remote_fs $syslog
 # Default-Start:	2 3 4 5
 # Default-Stop:		0 1 6
-# Short-Description:	The VSCP daemon
+# Short-Description:	The VSCP MQTT daemon
 # Description: 
 #  This is a daemon that supports version 3.1 of the MQ Telemetry
 #  Transport (MQTT) protocol.

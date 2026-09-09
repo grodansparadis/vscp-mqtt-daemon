@@ -11,7 +11,7 @@ vscp-mkpasswd - Generate VSCP user credentials-
 vscp-mkpasswd [*options*]
 
 # DESCRIPTION
-A tiny VSCP daemon/server for use with the VSCP & Friends m2m/IoT framework.
+A tiny VSCP MQTT daemon/server for use with the VSCP & Friends m2m/IoT framework.
 
 # SEE ALSO
 

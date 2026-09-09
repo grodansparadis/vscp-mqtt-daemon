@@ -26,7 +26,7 @@ Depends: adduser (>= 3.10),
          libsystemd-dev,
          libwrap0-dev (>=7.6),
          libz-dev
-Description: VSCP daemon
+Description: VSCP MQTT daemon
  A daemon that act as a hub and logic controller for a VSCP based system. It is
  possible to add drivers to physical devices, interface external nodes over
  tcp/ip, websockets and to perform other higher end functionality.

@@ -337,7 +337,7 @@ main(int argc, char **argv)
     }
   }
 
-  console->info("Starting the VSCP daemon...");
+  console->info("Starting the VSCP MQTT daemon...");
   console->info("Configfile = {}", strcfgfile);
 
   VSCP_UDP_LOG("Main paths: root=%s cfg=%s", rootFolder.c_str(), strcfgfile.c_str());

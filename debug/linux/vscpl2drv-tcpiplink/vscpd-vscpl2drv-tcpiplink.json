@@ -2,7 +2,7 @@
     "runasuser" : "vscp",
     "debug" : 0,		
     "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
-    "servername" : "The VSCP daemon",
+    "servername" : "The VSCP MQTT Daemon",
     "classtypedb" : "/var/lib/vscp/vscpd/vscp_events.sqlite3",
     "maindb" : "/var/lib/vscp/vscpd/vscp.sqlite3",
     "vscpkey" : "/var/vscp/vscp.key",

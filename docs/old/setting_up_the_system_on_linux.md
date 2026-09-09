@@ -21,7 +21,7 @@ When this is written the 15.0.0 release is the latest and the Debian package is 
 
 after downloading the file.
 
-When you have installed the package you can start the VSCP daemon with
+When you have installed the package you can start the VSCP MQTT daemon with
 
 ```bash
 systemctl start vscpd
@@ -35,7 +35,7 @@ Now read the section about configuring your system.
 
 **Note:** Use only for testing !!!!
 
-The VSCP project also have a private package repository which currently is experimental. The repository holds files for amd64/i385/armhf that should work on all debian derived systems such as Ubuntu and Raspbian as well as on Debian itself. The repository holds all drivers, the VSCP daemon and many other packages.
+The VSCP project also have a private package repository which currently is experimental. The repository holds files for amd64/i385/armhf that should work on all debian derived systems such as Ubuntu and Raspbian as well as on Debian itself. The repository holds all drivers, the VSCP MQTT daemon and many other packages.
 
 To use it you must add a signing key to your apt install system. You do this with
 

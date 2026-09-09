@@ -169,7 +169,7 @@ You can find the documentation for the driver [here](./level2_driver_mqtt.md)
 
 ### Publish
 
-The first thing you should do is to add the driver to the VSCP daemon configuration file. To do this look up the `<vscpdriver>`  ...  `</vscpdriver>` tags in the file and add
+The first thing you should do is to add the driver to the VSCP MQTT daemon configuration file. To do this look up the `<vscpdriver>`  ...  `</vscpdriver>` tags in the file and add
 
 ```xml
 <driver enable="true">
@@ -294,7 +294,7 @@ All command of the daemon is described [here](./tcp_ip_control_interface.md).
 ### Using variables
 
 
-The configure string in the VSCP daemon driver configuration can be replaced by VSCP variables instead. Actually a value specified in a variable will be used before a value in a configuration string. So if you have both the variable value will have precedence.
+The configure string in the VSCP MQTT daemon driver configuration can be replaced by VSCP variables instead. Actually a value specified in a variable will be used before a value in a configuration string. So if you have both the variable value will have precedence.
  
 All the variables for the MQTT driver is defined [here](./level2_driver_mqtt.md). There is one each for the configuration values defined above.
 

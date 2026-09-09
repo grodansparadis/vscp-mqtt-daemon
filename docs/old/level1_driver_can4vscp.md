@@ -4,9 +4,9 @@
 
 **Driver for Windows** vscpl1_can4vscpdrv.dll (install-dir/drivers)
 
-**Driver for Linux** vscpl1_can4vscpdrv.so (*/usr/local/lib/vscpl1_can4vscpdrv.so*) When using the drive on Linux remember to set rw permissions for the user that the VSCP daemon and VSCP works run under (*chmod a+rw /dev/ttyUSB0* for example).
+**Driver for Linux** vscpl1_can4vscpdrv.so (*/usr/local/lib/vscpl1_can4vscpdrv.so*) When using the drive on Linux remember to set rw permissions for the user that the VSCP MQTT daemon and VSCP works run under (*chmod a+rw /dev/ttyUSB0* for example).
 
-This is a driver for the low cost **Frankfurt RS-232 module** that us the [VSCP serial protocol](http://docs.vscp.org/spec/latest/#/./vscp_over_a_serial_channel_rs-232). The Frankfurt RS-232 module is described [here](https://www.vscp.org/can4vscp-rs232/can4vscp-rs232.html) where there also is a description of how to use it with VSCP Works and the VSCP daemon.
+This is a driver for the low cost **Frankfurt RS-232 module** that us the [VSCP serial protocol](http://docs.vscp.org/spec/latest/#/./vscp_over_a_serial_channel_rs-232). The Frankfurt RS-232 module is described [here](https://www.vscp.org/can4vscp-rs232/can4vscp-rs232.html) where there also is a description of how to use it with VSCP Works and the VSCP MQTT daemon.
 
 As the VSCP serial protocol is very generic this may also be the driver to use for your own hardware that have a serial port available.
 
@@ -52,7 +52,7 @@ This is an optional baudrate code. If not given the dafault 115200 will be used.
 
 Tests on Windows and Linux has been done on a Windows 10 machine and on a Ubuntu machine with the USB serial adapter that ship with [Frankfurt RS-232](https://www.vscp.org/frankfurt/rs232/frankfurt-rs232.html).
 
-Typical settings for VSCP daemon config
+Typical settings for VSCP MQTT daemon config
 
 ```xml
     <driver enable="true" >
@@ -131,7 +131,7 @@ Nov  3 14:13:01 pi3 vscpd: deviceLevel1WriteThread - m_proc_CanalBlockingSend fa
 Nov  3 14:13:01 pi3 vscpd: deviceLevel1WriteThread - m_proc_CanalBlockingSend failed
 ```
 
-In this case the user the VSCP daemon run as (vscp) does not have rights to use the serial port. If you check permissions with
+In this case the user the VSCP MQTT daemon run as (vscp) does not have rights to use the serial port. If you check permissions with
 
 ```bash
 sudo ls /dev/ttyUSB0

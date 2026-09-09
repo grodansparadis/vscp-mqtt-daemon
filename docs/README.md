@@ -1,4 +1,4 @@
-# The VSCP Daemon
+# The VSCP MQTT Daemon
 
 ![VSCP logo](./images/logo_100.png)
 

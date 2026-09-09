@@ -292,7 +292,7 @@ CControlObject::CControlObject()
     return;
   }
 
-  m_strServerName = "VSCP Daemon";
+  m_strServerName = "VSCP MQTT daemon";
   m_rootFolder    = "/var/lib/vscp/mqttvscpd/";
 
   m_pathClassTypeDefinitionDb = "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3";
@@ -619,7 +619,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       if (SQLITE_OK != sqlite3_open(m_pathMainDb.c_str(), &m_db_vscp_daemon)) {
 
         // Failed to open/create the database file
-        spdlog::error("controlobject:  VSCP Daemon database could not be opened/created. - Path={} error={}",
+        spdlog::error("controlobject:  VSCP MQTT daemon database could not be opened/created. - Path={} error={}",
                       m_pathMainDb,
                       sqlite3_errmsg(m_db_vscp_daemon));
         sqlite3_close(m_db_vscp_daemon);
@@ -652,7 +652,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       if (SQLITE_OK != sqlite3_open(m_pathMainDb.c_str(), &m_db_vscp_daemon)) {
         // Failed to open/create the database file
         spdlog::error(
-          "controlobject:  VSCP Daemon database could not be opened/created (check access rights). - Path={} error={}",
+          "controlobject:  VSCP MQTT daemon database could not be opened/created (check access rights). - Path={} error={}",
           m_pathMainDb,
           sqlite3_errmsg(m_db_vscp_daemon));
         sqlite3_close(m_db_vscp_daemon);
@@ -661,7 +661,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       }
 
       // We will try to create it
-      spdlog::info("controlobject:  Will try to create VSCP Daemon database here {}.", m_pathMainDb);
+      spdlog::info("controlobject:  Will try to create VSCP MQTT daemon database here {}.", m_pathMainDb);
 
       // Create settings db
       char *pErrMsg = 0;
@@ -676,7 +676,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
                 );";
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, psql, NULL, NULL, &pErrMsg)) {
-        spdlog::error("controlobject:  Creation of the VSCP database failed with message {}", pErrMsg);
+        spdlog::error("controlobject:  Creation of the VSCP MQTT daemon database failed with message {}", pErrMsg);
         sqlite3_free(pErrMsg);
         return false;
       }
@@ -684,7 +684,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       psql = "CREATE INDEX \"idxguid\" ON \"discovery\" (\"guid\")";
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, psql, NULL, NULL, &pErrMsg)) {
-        spdlog::error("controlobject:  Creation of the VSCP database index idxguid failed with message {}", pErrMsg);
+        spdlog::error("controlobject:  Creation of the VSCP MQTT daemon database index idxguid failed with message {}", pErrMsg);
         sqlite3_free(pErrMsg);
         return false;
       }
@@ -692,7 +692,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       psql = "CREATE INDEX \"idxname\" ON \"discovery\" (\"name\")";
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, psql, NULL, NULL, &pErrMsg)) {
-        spdlog::error("controlobject:  Creation of the VSCP database index idxname failed with message {}", pErrMsg);
+        spdlog::error("controlobject:  Creation of the VSCP MQTT daemon database index idxname failed with message {}", pErrMsg);
         sqlite3_free(pErrMsg);
         return false;
       }
@@ -708,7 +708,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       sql += buf;
       sql += "','";
       sql += m_guid.getAsString();
-      sql += "','local-vscp-daemon','The local VSCP Daemon');";
+      sql += "','local-vscp-daemon','The local VSCP MQTT Daemon');";
 
       if (SQLITE_OK != sqlite3_exec(m_db_vscp_daemon, sql.c_str(), NULL, NULL, &pErrMsg)) {
         spdlog::error("controlobject:  Creation of the VSCP database index idxname failed with message {}", pErrMsg);
@@ -806,7 +806,7 @@ CControlObject::init_mqtt()
                                                     strPayload.c_str(),
                                                     2,
                                                     true))) {
-      spdlog::error("Failed to publish VSCP daemon name. error={0} {1}", rv, mosquitto_strerror(rv));
+      spdlog::error("Failed to publish VSCP MQTT daemon name. error={0} {1}", rv, mosquitto_strerror(rv));
     }
   }
 
@@ -826,7 +826,7 @@ CControlObject::init_mqtt()
                                                     strPayload.c_str(),
                                                     2,
                                                     true))) {
-      spdlog::error("Failed to publish VSCP daemon server version. error={0} {1}", rv, mosquitto_strerror(rv));
+      spdlog::error("Failed to publish VSCP MQTT daemon server version. error={0} {1}", rv, mosquitto_strerror(rv));
     }
   }
 
@@ -848,7 +848,7 @@ CControlObject::init_mqtt()
                                                     strPayload.c_str(),
                                                     2,
                                                     true))) {
-      spdlog::error("Failed to publish VSCP daemon start time. error={0} {1}", rv, mosquitto_strerror(rv));
+      spdlog::error("Failed to publish VSCP MQTT daemon start time. error={0} {1}", rv, mosquitto_strerror(rv));
     }
   }
 
@@ -870,7 +870,7 @@ CControlObject::init_mqtt()
                                                     strPayload.c_str(),
                                                     2,
                                                     true))) {
-      spdlog::error("Failed to publish VSCP daemon drivers. error={0} {1}", rv, mosquitto_strerror(rv));
+      spdlog::error("Failed to publish VSCP MQTT daemon drivers. error={0} {1}", rv, mosquitto_strerror(rv));
     }
   }
 
@@ -890,7 +890,7 @@ CControlObject::init_mqtt()
                                                     strPayload.c_str(),
                                                     2,
                                                     true))) {
-      spdlog::error("Failed to publish VSCP daemon name<->guid index. error={0} {1}", rv, mosquitto_strerror(rv));
+      spdlog::error("Failed to publish VSCP MQTT daemon name<->guid index. error={0} {1}", rv, mosquitto_strerror(rv));
     }
   }
 
@@ -1184,7 +1184,7 @@ CControlObject::periodicEvents(void)
   time(&tnow);
   uint32_t time32 = (uint32_t) tnow;
 
-  ex.data[0] = 0;                                 // 8 - bit crc for VSCP daemon GUID
+  ex.data[0] = 0;                                 // 8 - bit crc for VSCP MQTT daemon GUID
   ex.data[1] = (uint8_t) ((time32 >> 24) & 0xff); // Time since epoch MSB
   ex.data[2] = (uint8_t) ((time32 >> 16) & 0xff);
   ex.data[3] = (uint8_t) ((time32 >> 8) & 0xff);
@@ -1311,7 +1311,7 @@ CControlObject::discovery(vscpEvent *pev)
                                                     j.dump().c_str(),
                                                     1,
                                                     true))) {
-      spdlog::error("Failed to publish VSCP daemon discovery. error={0} {1}", rv, mosquitto_strerror(rv));
+      spdlog::error("Failed to publish VSCP MQTT daemon discovery. error={0} {1}", rv, mosquitto_strerror(rv));
     }
 
     // Add local host to in memory map

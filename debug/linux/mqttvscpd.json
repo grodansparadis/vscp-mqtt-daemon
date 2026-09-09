@@ -73,7 +73,7 @@
             "topic": "vscp-daemon/{{srvguid}}/will",
             "qos": 1,
             "retain": true,
-            "payload": "VSCP Daemon is down"
+            "payload": "VSCP MQTT Daemon is down"
         },
         "subscribe": [
             {

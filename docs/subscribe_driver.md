@@ -1,6 +1,6 @@
 # Driver subscriptions
 
-A driver can subscribe to any number of topics. At least as long as the broker and the computer that runs the VSCP daemon can handle it.
+A driver can subscribe to any number of topics. At least as long as the broker and the computer that runs the VSCP MQTT daemon can handle it.
 
 Driver subscriptions work in the same way as [server subscriptions](./subscribe_server.md) so read the information in that document as well.
 
@@ -82,7 +82,7 @@ Valid values are
 
 | Format | Description |
 | ------ | ----------- |
-| auto | The VSCP daemon will try to detect the payload format. |
+| auto | The VSCP MQTT daemon will try to detect the payload format. |
 | json | JSON formatted payload will be expected. |
 | xml  | XML formatted paylaod will be expected. |
 | string | Comma separated string formatted payload will be expected. |
