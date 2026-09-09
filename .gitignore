@@ -46,6 +46,10 @@ build/
 *.tgz
 *.tar.gz
 *.deb
+*.rpm
+*.zip
+*.sha256
+_CPack_Packages/
 
 
 #Ignore vscode AI rules
