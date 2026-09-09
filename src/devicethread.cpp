@@ -531,6 +531,9 @@ deviceThread(void *pData)
             if (NULL != pev) {
 
               memset(pev, 0, sizeof(vscpEvent));
+              
+              // Set new frame version to UNIX_NS
+              pev->head = (pev->head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
 
               // Convert CANAL message to VSCP event
               if (!vscp_convertCanalToEvent(pev, &msg, (unsigned char *) pDeviceItem->m_guid.getGUID())) {
@@ -739,8 +742,20 @@ deviceThread(void *pData)
         continue;
       }
 
-      // If timestamp_ns is zero we set it here
-      if (0 == ev.timestamp_ns) {
+      // Original frame: convert a valid datetime block to timestamp_ns,
+      // otherwise stamp with current time
+      if (VSCP_HEADER16_FRAME_VERSION_UNIX_NS != (ev.head & VSCP_HEADER16_FRAME_VERSION_MASK)) {
+        int64_t ns = -1;
+        if ((ev.year > 0) && (ev.year < 0xffff) && (ev.month >= 1) && (ev.month <= 12) && (ev.day >= 1) &&
+            (ev.day <= 31) && (ev.hour <= 23) && (ev.minute <= 59) && (ev.second <= 59)) {
+          ns = vscp_to_unix_ns(ev.year, ev.month, ev.day, ev.hour, ev.minute, ev.second, ev.timestamp);
+        }
+        ev.head         = (ev.head & ~VSCP_HEADER16_FRAME_VERSION_MASK) | VSCP_HEADER16_FRAME_VERSION_UNIX_NS;
+        ev.year         = 0xffff;
+        ev.month        = 0xff;
+        ev.timestamp_ns = (ns > 0) ? (uint64_t) ns : vscp_makeTimeStampNs();
+      }
+      else if (0 == ev.timestamp_ns) {
         ev.timestamp_ns = vscp_makeTimeStampNs();
       }
 
