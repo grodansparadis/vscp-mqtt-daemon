@@ -1,5 +1,6 @@
 # vscp-mqtt-daemon
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![CI Codacy](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-codacy.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-codacy.yml) [![CI Linux](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-linux.yml) [![CI macOS](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-macos.yml)  [![CI Windows](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-windows.yml)  [![CI Raspberry Pi](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-raspberry-pi.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-raspberry-pi.yml)
 
 
