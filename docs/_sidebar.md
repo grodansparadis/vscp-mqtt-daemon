@@ -34,7 +34,6 @@
   * [Level II Drivers](level_ii_drivers.md)
 
 * Appendix
- * [History](./history.md)
  * [Setting up a Mosquitto MQTT broker](./mosquitto_set_up_broker.md)
  * [Setting up websockets on a Mosquitto MQTT broker](./mosquitto_set_up_websockets.md)
 

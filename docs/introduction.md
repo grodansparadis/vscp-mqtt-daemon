@@ -8,6 +8,8 @@ From version 15.0 The VSCP MQTT MQTT daemon work tightly together with a local o
 
 Functionality that previously was incorporated in the VSCP MQTT daemon is now available as drivers. So now the built in web-server with websocket interfaces etc is instead a driver. Also the tcp/ip interface is available as a driver.
 
+A new versioning system is now used. Instead of a major.minor.patch versioning we now use year.month.patch. The path number is updated with each repository checkin and year and month is two digit items.
+
 ## Overview
 
 ![](./images/vscpd_connection_overview.png)
@@ -46,28 +48,28 @@ Also there is now a focus on the lower end of things in the VSCP development. Ot
 
 ## Removed functionality in the new version of the VSCP MQTT daemon
 
-Not only was all code rewritten to use standard c++ in the transition from version 14.0 to 15.0 a lot of functionality was also removed. 
+Not only was all code rewritten to use standard c++ in the transition from version 14.0 to 15.0 a lot of functionality was also removed. This software now amainly server as a gatway between VSCP transports and a MQTT broker.
 
 A lot of the old functionality has been moved to installable drivers instead.
 
-## tcp/ip interface
+### tcp/ip interface
 In the 14.0 version of VSCP MQTT daemon the tcp/ip interface was a central piece. If you still need it, install the driver [vscpl2drv-tcpipsrv](https://github.com/grodansparadis/vscpl2drv-tcpipsrv).
 
 If you want to connect to another device with a VSCP tcp/ip interface you can use the driver [vscpl2drv-tcpiplink](https://github.com/grodansparadis/vscpl2drv-tcpiplink). This makes it possible to connect the new VSCP MQTT daemon to a machine with 14.0 installed or a more lower end ethernet node with the tcp/ip interface exported.
 
-## Web-server, websockets, REST
+### Web-server, websockets, REST
 In the 14.0 version of VSCP MQTT daemon a webserver with server side LUA and javascript support and with websocket (ws1 and ws2) and a REST interface was available. Well there was a lot more also. If you miss this donät despair. The functionality is now available as a driver. Go to the [vscpl2drv-websrv](https://github.com/grodansparadis/vscpl2drv-websrv) repository for more info on how to install and use.
 
-## Decision Matrix
+### Decision Matrix
 Has been removed. Use [node-red](https://nodered.org/) instead. There may be a driver with this functionality available in the future. Check out [vscpl2drv-dm](https://github.com/grodansparadis/vscpl2drv-dm) or better yet help out to build the functionality.
 
-## Tables
+### Tables
 Has been removed. Use [node-red](https://nodered.org/) instead. There may be a driver with this functionality available in the future. Check out [vscpl2drv-table](https://github.com/grodansparadis/vscpl2drv-table) or better yet help out to build the functionality.
 
-## Remote variables
+### Remote variables
 Has been removed. There may be a driver with this functionality available in the future. Check out [vscpl2drv-variable](https://github.com/grodansparadis/vscpl2drv-variable)) or better yet help out to build the functionality.
 
-## Was it more...?
+### Was it more...?
 Probably. If you miss something you can't live without, version 14 can still be run and be used. You can also take on the effort to build a driver for that thing. 
 
 ## Support
