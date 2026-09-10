@@ -54,10 +54,28 @@ target_include_directories(vscp_mdf
         third-party/spdlog/include
         third-party/vscp/third_party/maddy/include)
 
-if(WIN32 AND TARGET vscp_sockettcp)
-    target_include_directories(vscp_sockettcp
-        PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+if(WIN32)
+    set(MQTTVSCPD_WINDOWS_PCH_CONSUMER_TARGETS
+        vscp_sockettcp
+        vscp_guid
+        vscp_mdf
+        vscp_core
+        vscp_client_base
+        vscp_client_canal
+        vscp_client_tcp
+        vscp_client_udp
+        vscp_client_ws1
+        vscp_client_ws2
+        vscp_client_multicast
+        vscp_client_mqtt
+        vscp_common)
+    foreach(vscp_target IN LISTS MQTTVSCPD_WINDOWS_PCH_CONSUMER_TARGETS)
+        if(TARGET ${vscp_target})
+            target_include_directories(${vscp_target}
+                PRIVATE
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        endif()
+    endforeach()
 endif()
 
 set(MQTTVSCPD_SOURCES
