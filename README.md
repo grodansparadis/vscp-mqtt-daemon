@@ -7,7 +7,7 @@
 
 There are currently two daemons (servers) for the VSCP protocol. The VSCP MQTT daemon (**vscp-mqtt-daemon**) and the [VSCP tcp/ip daemon (vscp-tcpip-daemon)](https://github.com/grodansparadis/vscp-tcpip-daemon). They manily differ in the way they expose VSCP events.
 
-The **vscp-mqtt-daemon** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers and get data from a MQTT server. It support all level I and level II drivers.
+The **vscp-mqtt-daemon** is oriented around the MQTT protocol. It can be used to connect different VSCP transports semlessly to a MQTT server or to many MQTT servers and get data from a MQTT server. It support all level I and level II drivers. **It is NOT a MQTT broker**
 
 The **vscp-tcpip-daemon** export the VSCP tcp/ip link protocol and can just as the __vscp-mqtt-daemon__ connect to different VSCP transport mechanism but instead of transfering data to a MQTT server it serves other devices through it's own server interface. It support all level I and level II drivers. As there is a MQTT driver ([vscpl2drv-mqtt](https://github.com/grodansparadis/vscpl2drv-mqtt)) it is also possible to connect to MQTT servers with this daemon.
 
