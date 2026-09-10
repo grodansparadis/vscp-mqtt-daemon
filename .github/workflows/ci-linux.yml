@@ -49,7 +49,6 @@ jobs:
         run: >-
           cmake -S . -B build
           -DCMAKE_BUILD_TYPE=Release
-          -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
           -DVSCPD_PACKAGE_GENERATORS=TGZ\;DEB\;RPM\;ZIP
 
       - name: Build

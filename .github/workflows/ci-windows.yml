@@ -50,7 +50,6 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
           -DVCPKG_TARGET_TRIPLET=x64-windows
           -DVSCPD_BUILD_MANPAGES=OFF
-          -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
           -DVSCPD_PACKAGE_GENERATORS=ZIP\;NSIS
 
       - name: Build

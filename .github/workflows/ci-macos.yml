@@ -38,7 +38,6 @@ jobs:
           cmake -S . -B build
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_PREFIX_PATH=${BREW_PREFIXES}
-          -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
           -DVSCPD_PACKAGE_GENERATORS=TGZ\;ZIP
 
       - name: Build

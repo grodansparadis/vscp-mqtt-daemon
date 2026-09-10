@@ -46,7 +46,6 @@ jobs:
         run: >-
           docker run --rm
           --platform ${{ matrix.platform }}
-          -e VSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER}
           -v "${{ github.workspace }}:/workspace"
           -w /workspace
           ${{ matrix.image }}
@@ -70,7 +69,6 @@ jobs:
               rpm
             cmake -S . -B build \
               -DCMAKE_BUILD_TYPE=Release \
-              -DVSCPD_BUILD_NUMBER=${VSCPD_BUILD_NUMBER} \
               '-DVSCPD_PACKAGE_GENERATORS=TGZ;DEB;RPM;ZIP'
             cmake --build build --parallel
             cpack --config build/CPackConfig.cmake -C Release
