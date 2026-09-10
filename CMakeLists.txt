@@ -54,6 +54,12 @@ target_include_directories(vscp_mdf
         third-party/spdlog/include
         third-party/vscp/third_party/maddy/include)
 
+if(WIN32 AND TARGET vscp_sockettcp)
+    target_include_directories(vscp_sockettcp
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src)
+endif()
+
 set(MQTTVSCPD_SOURCES
     src/controlobject.cpp
     src/devicelist.cpp
