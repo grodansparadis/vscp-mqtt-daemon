@@ -20,6 +20,14 @@ if [ -f "${vcpkg_manifest}" ]; then
   perl -pi -e "s/(\"version-string\"\s*:\s*)\"[^\"]*\"/\${1}\"${version}\"/" "${vcpkg_manifest}"
 fi
 
+# Keep docs variables in sync
+docs_variables="$(dirname "${version_file}")/../docs/variables.xml"
+if [ -f "${docs_variables}" ]; then
+  timestamp=$(date -u +"%Y-%m-%d %H:%M")
+  perl -pi -e "s/(<creation-time>)[^<]*(<\/creation-time>)/\${1}${timestamp}\${2}/" "${docs_variables}"
+  perl -pi -e "s/(<document-version>)[^<]*(<\/document-version>)/\${1}${version}\${2}/" "${docs_variables}"
+fi
+
 # Expose the version to GitHub Actions steps
 if [ -n "${GITHUB_ENV:-}" ]; then
   echo "VSCPD_VERSION=${version}" >> "${GITHUB_ENV}"

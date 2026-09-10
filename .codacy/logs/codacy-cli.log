@@ -506,3 +506,16 @@
 2026/09/10 08:42:06 Running tools for the specified file(s)...
 2026/09/10 08:42:06 Running trivy...
 2026-09-10T08:42:06+02:00 [INFO] (codacy-cli-v2/cmd/analyze.go:360) Config file found for tool tool=trivy toolConfigPath=.codacy/tools-configs/trivy.yaml
+2026-09-10T11:29:32+02:00 [INFO] (codacy-cli-v2/cli-v2.go:27) Starting Codacy CLI version=1.0.0-main.380.sha.27e119a (27e119a) built at 2026-06-11T09:54:47Z
+2026-09-10T11:29:32+02:00 [INFO] (codacy-cli-v2/cmd/root.go:34) Executing CLI command command=analyze full_command=[/home/akhe/.cache/codacy/codacy-cli-v2/1.0.0-main.380.sha.27e119a/codacy-cli-v2 analyze /home/akhe/development/VSCP/vscp-mqtt-daemon/scripts/update-version.sh --format sarif] args=[/home/akhe/development/VSCP/vscp-mqtt-daemon/scripts/update-version.sh]
+2026/09/10 11:29:32 Running all configured tools...
+2026/09/10 11:29:32 Skipping pmd as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Skipping pylint as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Skipping revive as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Skipping trivy as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Skipping dartanalyzer as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Skipping eslint as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Skipping lizard as it doesn't support the specified file(s)
+2026/09/10 11:29:32 Running tools for the specified file(s)...
+2026/09/10 11:29:32 Running opengrep...
+2026-09-10T11:29:32+02:00 [INFO] (codacy-cli-v2/cmd/analyze.go:360) Config file found for tool tool=opengrep toolConfigPath=.codacy/tools-configs/semgrep.yaml
