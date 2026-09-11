@@ -38,7 +38,7 @@
 #define VSCPD_DEFAULT_CONFIG_FILE "c:\\ProgramData\\vscp\\mqttvscpd.json"
 #else
 #define VSCPD_DEFAULT_ROOT_FOLDER "/var/lib/vscp/mqttvscpd/"
-#define VSCPD_DEFAULT_CONFIG_FILE "/etc/mqttvscpd.json"
+#define VSCPD_DEFAULT_CONFIG_FILE "/etc/vscp/mqttvscpd.json"
 #endif
 
 
