@@ -9,7 +9,6 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  VSCPD_BUILD_NUMBER: ${{ github.run_number }}
 
 jobs:
   build:
