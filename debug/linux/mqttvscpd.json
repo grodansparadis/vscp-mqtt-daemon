@@ -40,7 +40,7 @@
         },
         "user" : "vscp",
         "password": "secret",
-        "clientid" : "fluorine vscpd {{rnd}}",  
+        "clientid" : "fluorine mqttvscpd: {{rnd}}",  
         "publish-format" : "json",
         "subscribe-format" : "auto",
         "qos" : 1,
@@ -281,7 +281,7 @@
                 "enable" : false,
                 "name" : "Loggerdrv",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-logger.so",
-                "path-config" : "/var/lib/vscp/vscpd/logger2.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/logger2.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:02:00:00:00:00:00:00:01",
 
                 "mqtt" : {
@@ -406,7 +406,7 @@
                 "enable" : false,
                 "name" : "lmsensors",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-lmsensors.so",
-                "path-config" : "/var/lib/vscp/vscpd/lmsensors.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/lmsensors.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:06:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -531,7 +531,7 @@
                 "enable" : false,
                 "name" : "socketcan",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-socketcan.so",
-                "path-config" : "/var/lib/vscp/vscpd/socketcan.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/socketcan.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:07:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -656,7 +656,7 @@
                 "enable" : false,
                 "name" : "mqtt",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-mqtt.so",
-                "path-config" : "/var/lib/vscp/vscpd/mqtt.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/mqtt.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:08:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -781,7 +781,7 @@
                 "enable" : false,
                 "name" : "tcpiplink",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-tcpiplink.so",
-                "path-config" : "/var/lib/vscp/vscpd/tcpiplink.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/tcpiplink.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:09:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -906,7 +906,7 @@
                 "enable" : false,
                 "name" : "rawethernet",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-raweth.so",
-                "path-config" : "/var/lib/vscp/vscpd/raweth.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/raweth.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:0A:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -1031,7 +1031,7 @@
                 "enable" : false,
                 "name" : "sim",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-sim.so",
-                "path-config" : "/var/lib/vscp/vscpd/sim.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/sim.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:0B:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -1156,7 +1156,7 @@
                 "enable" : false,
                 "name" : "1-wire",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-wire1.so",
-                "path-config" : "/var/lib/vscp/vscpd/wire1.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/wire1.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:0C:00:00:00:00:00:00:00",
 
                 "mqtt" : {

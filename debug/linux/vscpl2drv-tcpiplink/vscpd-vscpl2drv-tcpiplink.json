@@ -3,8 +3,8 @@
     "debug" : 0,		
     "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
     "servername" : "The VSCP MQTT Daemon",
-    "classtypedb" : "/var/lib/vscp/vscpd/vscp_events.sqlite3",
-    "maindb" : "/var/lib/vscp/vscpd/vscp.sqlite3",
+    "classtypedb" : "/var/lib/vscp/mqttmqttvscpd::/vscp_events.sqlite3",
+    "maindb" : "/var/lib/vscp/mqttmqttvscpd::/vscp.sqlite3",
     "vscpkey" : "/var/vscp/vscp.key",
 
     "mqtt" : {
@@ -189,7 +189,7 @@
                 "enable" : false,
                 "name" : "Logger",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-logger.so",
-                "path-config" : "/var/lib/vscp/vscpd/logger2.conf",
+                "path-config" : "/var/lib/vscp/mqttmqttvscpd::/logger2.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:02:00:00:00:00:00:00:01",
 
                 "mqtt" : {
@@ -223,7 +223,7 @@
                 "enable" : false,
                 "name" : "lmsensors",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-lmsensors.so",
-                "path-config" : "/var/lib/vscp/vscpd/lmsensors.conf",
+                "path-config" : "/var/lib/vscp/mqttmqttvscpd::/lmsensors.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:06:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -257,7 +257,7 @@
                 "enable" : false,
                 "name" : "socketcan",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-socketcan.so",
-                "path-config" : "/var/lib/vscp/vscpd/socketcan.conf",
+                "path-config" : "/var/lib/vscp/mqttmqttvscpd::/socketcan.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:07:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -291,7 +291,7 @@
                 "enable" : false,
                 "name" : "mqtt",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-mqtt.so",
-                "path-config" : "/var/lib/vscp/vscpd/mqtt.conf",
+                "path-config" : "/var/lib/vscp/mqttmqttvscpd::/mqtt.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:08:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -359,7 +359,7 @@
                 "enable" : false,
                 "name" : "rawethernet",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-raweth.so",
-                "path-config" : "/var/lib/vscp/vscpd/raweth.conf",
+                "path-config" : "/var/lib/vscp/mqttmqttvscpd::/raweth.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:0A:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -393,7 +393,7 @@
                 "enable" : false,
                 "name" : "sim",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-sim.so",
-                "path-config" : "/var/lib/vscp/vscpd/sim.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/sim.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:0B:00:00:00:00:00:00:00",
 
                 "mqtt" : {
@@ -427,7 +427,7 @@
                 "enable" : false,
                 "name" : "1-wire",
                 "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-wire1.so",
-                "path-config" : "/var/lib/vscp/vscpd/wire1.conf",
+                "path-config" : "/var/lib/vscp/mqttvscpd:/wire1.conf",
                 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:0C:00:00:00:00:00:00:00",
 
                 "mqtt" : {

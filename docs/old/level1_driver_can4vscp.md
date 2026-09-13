@@ -112,23 +112,23 @@ You can find the description of the VSCP serial protocol in the [VSCP specificat
 On Linux you need to have permission to use the serial port. If you have debug enabled for the driver you will see something like this in /var/log/syslog if you have problem with serila port permissons
 
 ```
-Nov  3 14:12:58 pi3 vscpd: Devicethread: Starting driver_can4vscp
-Nov  3 14:12:58 pi3 vscpd: Loading level I driver: can4vscp
-Nov  3 14:12:58 pi3 vscpd: [vscpl1drv-can4vscp] Debug mode enabled.
-Nov  3 14:12:58 pi3 vscpd: [vscpl1drv-can4vscp] Open driver /dev/ttyUSB0 0x80000000
-Nov  3 14:12:58 pi3 vscpd: [vscpl1drv-can4vscp] Open [/dev/ttyUSB0] failed
-Nov  3 14:12:58 pi3 vscpd: [vscpl1drv-can4vscp] Open of port [/dev/ttyUSB0] successful
-Nov  3 14:12:59 pi3 vscpd: Send event to client [driver_can4vscp]
-Nov  3 14:12:59 pi3 vscpd: Send event to client [driver_can4vscp]
-Nov  3 14:12:59 pi3 vscpd: Send event to client [driver_can4vscp]
-Nov  3 14:12:59 pi3 vscpd: Send event to client [driver_can4vscp]
-Nov  3 14:13:00 pi3 vscpd: [vscpl1drv-can4vscp] NOOP initial command test failed.
-Nov  3 14:13:01 pi3 vscpd: [vscpl1drv-can4vscp] Failed to open device in standard mode.
-Nov  3 14:13:01 pi3 vscpd: [vscpl1drv-can4vscp] Open success
-Nov  3 14:13:01 pi3 vscpd: can4vscp: [Device tread] Level I Driver open.
-Nov  3 14:13:01 pi3 vscpd: can4vscp: [Device tread] Level I blocking version.
-Nov  3 14:13:01 pi3 vscpd: deviceLevel1WriteThread - m_proc_CanalBlockingSend failed
-Nov  3 14:13:01 pi3 vscpd: deviceLevel1WriteThread - m_proc_CanalBlockingSend failed
+Nov  3 14:12:58 pi3 mqttvscpd: Devicethread: Starting driver_can4vscp
+Nov  3 14:12:58 pi3 mqttvscpd: Loading level I driver: can4vscp
+Nov  3 14:12:58 pi3 mqttvscpd: [vscpl1drv-can4vscp] Debug mode enabled.
+Nov  3 14:12:58 pi3 mqttvscpd: [vscpl1drv-can4vscp] Open driver /dev/ttyUSB0 0x80000000
+Nov  3 14:12:58 pi3 mqttvscpd: [vscpl1drv-can4vscp] Open [/dev/ttyUSB0] failed
+Nov  3 14:12:58 pi3 mqttvscpd: [vscpl1drv-can4vscp] Open of port [/dev/ttyUSB0] successful
+Nov  3 14:12:59 pi3 mqttvscpd: Send event to client [driver_can4vscp]
+Nov  3 14:12:59 pi3 mqttvscpd: Send event to client [driver_can4vscp]
+Nov  3 14:12:59 pi3 mqttvscpd: Send event to client [driver_can4vscp]
+Nov  3 14:12:59 pi3 mqttvscpd: Send event to client [driver_can4vscp]
+Nov  3 14:13:00 pi3 mqttvscpd: [vscpl1drv-can4vscp] NOOP initial command test failed.
+Nov  3 14:13:01 pi3 mqttvscpd: [vscpl1drv-can4vscp] Failed to open device in standard mode.
+Nov  3 14:13:01 pi3 mqttvscpd: [vscpl1drv-can4vscp] Open success
+Nov  3 14:13:01 pi3 mqttvscpd: can4vscp: [Device tread] Level I Driver open.
+Nov  3 14:13:01 pi3 mqttvscpd: can4vscp: [Device tread] Level I blocking version.
+Nov  3 14:13:01 pi3 mqttvscpd: deviceLevel1WriteThread - m_proc_CanalBlockingSend failed
+Nov  3 14:13:01 pi3 mqttvscpd: deviceLevel1WriteThread - m_proc_CanalBlockingSend failed
 ```
 
 In this case the user the VSCP MQTT daemon run as (vscp) does not have rights to use the serial port. If you check permissions with

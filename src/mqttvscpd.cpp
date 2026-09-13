@@ -66,7 +66,7 @@
 
 #include "vscp-udp-log.h"
 #include "canal-macro.h"
-#include "vscpd.h"
+#include "mqttvscpd.h"
 #include "controlobject.h"
 #include <crc.h>
 #include <version.h>

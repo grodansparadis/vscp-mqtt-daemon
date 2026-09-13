@@ -9,13 +9,13 @@ It is very convenient to use one of the online JSON validators to validate the J
 When you change something in the configuration file you have to restart the VSCP MQTT daemon for the changes to take effect. You do this with
 
 ```bash
-sudo systemctl restart vscpd
+sudo systemctl restart mqttmqttvscpd::
 ```
 
-If something is wrong the MQTT VSCP MQTT daemon may not start. Check the log file at **/var/log/mqttvscpd.log**. You can also use
+If something is wrong the MQTT VSCP MQTT daemon may not start. Check the log file at **/var/log/mqttmqttmqttvscpd::.log**. You can also use
 
 ```bash
-ps aux | grep vscpd
+ps aux | grep mqttmqttvscpd::
 ```
 
 to see if the VSCP MQTT daemon is running or not.
@@ -28,15 +28,15 @@ The sample configuration file that is installed holds a lot of information. You 
   "debug": 0,
   "guid": "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
   "servername": "The VSCP MQTT daemon on HOST",
-  "classtypedb": "/var/lib/vscp/vscpd/vscp_events.sqlite3",
-  "maindb": "/var/lib/vscp/vscpd/vscp.sqlite3",
-  "discoverydb": "/var/lib/vscp/vscpd/vscp.sqlite3",
+  "classtypedb": "/var/lib/vscp/mqttmqttvscpd::/vscp_events.sqlite3",
+  "maindb": "/var/lib/vscp/mqttmqttvscpd::/vscp.sqlite3",
+  "discoverydb": "/var/lib/vscp/mqttmqttvscpd::/vscp.sqlite3",
   "vscpkey": "/etc/vscp/vscp.key",
   "logging": {
     "file-enable-log": true,
     "file-log-level": "debug",
     "file-pattern": "[vscp: %c] [%^%l%$] %v",
-    "file-path": "/var/log/vscp/vscpd.log",
+    "file-path": "/var/log/vscp/mqttvscpd:.log",
     "file-max-size": 5242880,
     "file-max-files": 7,
     "console-enable-log": true,
@@ -97,13 +97,13 @@ The sample configuration file that is installed holds a lot of information. You 
 
 ## Location of the configuration file
 
-The daemon needs a configuration file called **vscpd.json**. The server will not start without this file nor if the file contains invalid information or information on invalid format. Normally the installation program will create a default file.
+The daemon needs a configuration file called **mqttvscpd:.json**. The server will not start without this file nor if the file contains invalid information or information on invalid format. Normally the installation program will create a default file.
 
 On most machines the configuration file will be located in 
 
-    /etc/vscp/mqttvscpd.json
+    /etc/vscp/mqttmqttvscpd:.json
     
-The location that is searched to find the configuration file can be changed with switches when you start the daemon. see the section about [startup switches](http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_startup_switches) for each platform.
+The location that is searched to find the configuration file can be changed with switches when you start the daemon. see the section about [startup switches](http://www.vscp.org/docs/mqttvscpd:/doku.php?id=vscp_daemon_startup_switches) for each platform.
 
 ## To think about before you start :id=think-before
 
@@ -126,7 +126,7 @@ vscp_eth_to_guid eth0
 and you will get a valid GUID from your ethernet address. You can even use
 
 ```bash
-sudo vscp_eth_to_guid eth0 /etc/vscp/vscpd.json
+sudo vscp_eth_to_guid eth0 /etc/vscp/mqttvscpd:.json
 ```
 and the distributed demo GUID's set in the standard file will all be changed.
 
@@ -134,7 +134,7 @@ and the distributed demo GUID's set in the standard file will all be changed.
 
 The configuration file is a standard JSON file that contains information that tells the VSCP MQTT daemon what to do and how it should be done. The information in it is divided into sections and this documentation and each section and it's content is described below.
 
-You can view a sample configuration file [here](https://github.com/grodansparadis/vscp/blob/master/resources/linux/vscpd.json).
+You can view a sample configuration file [here](https://github.com/grodansparadis/vscp/blob/master/resources/linux/mqttvscpd:.json).
 
 ## The general section :id=config-general
 
@@ -145,16 +145,16 @@ In the general section you find settings that are common to all components of th
 "debug" : 0,	
 "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:00:00:00:00:00:00:00:01",
 "servername" : "The VSCP MQTT daemon on HOST",
-"classtypedb" : "/var/lib/vscp/mqttvscpd/vscp_events.sqlite3",
-"maindb" : "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
-"discoverydb" : "/var/lib/vscp/mqttvscpd/vscp.sqlite3",
+"classtypedb" : "/var/lib/vscp/mqttmqttvscpd:/vscp_events.sqlite3",
+"maindb" : "/var/lib/vscp/mqttmqttvscpd:/vscp.sqlite3",
+"discoverydb" : "/var/lib/vscp/mqttmqttvscpd:/vscp.sqlite3",
 "vscpkey" : "/var/vscp/vscp.key",
 
 "logging" : {
     "file-enable-log": true,
     "file-log-level" : "debug",
     "file-pattern" : "[mqttvscp %c] [%^%l%$] %v",
-    "file-path" : "/var/log/vscp/mqttvscpd.log",
+    "file-path" : "/var/log/vscp/mqttmqttvscpd:.log",
     "file-max-size" : 5242880,
     "file-max-files" : 7,
     "console-enable-log": false,
@@ -162,7 +162,7 @@ In the general section you find settings that are common to all components of th
     "console-pattern" : "[mqttvscp %c] [%^%l%$] %v",
     "syslog-enable-log" : true,
     "syslog-log-level" : "info",
-    "syslog-ident" : "mqttvscpd",
+    "syslog-ident" : "mqttmqttvscpd:",
     "udp-enable-log": true,
     "udp-log-level" : "info",
     "udp-pattern" : "[mqttvscp] [%^%l%$] %v",
@@ -269,7 +269,7 @@ sudo wget https://www.vscp.org/events/vscp_events.sqlite3
 ### maindb :id=config-general-maindb
 THis is the main database file for the VSCP MQTT daemon. It's main content is the discovery database which is used to collect information about nodes in the system. 
 
-This entry must point to a named file in a location that is writable (default is _/var/lib/vscp/vscpd/vscp.sqlite3_)
+This entry must point to a named file in a location that is writable (default is _/var/lib/vscp/mqttvscpd:/vscp.sqlite3_)
 
 ### vscpkey :id=config-general-vscpkey
 This is the path to a security key that the VSCP MQTT daemon use to encrypt/decrypt information with. The default is _/var/vscp/vscp.key_ This file should only be editable by the root user and also not be possible to read by any one else.
@@ -278,7 +278,7 @@ This is the path to a security key that the VSCP MQTT daemon use to encrypt/decr
 This is the debug level. Zero is no debugging. A higher number is different levels of debugging detail.
 
 ### logging :id=config-general-logging
-This is the log console and file settings. Default is to log to the logfile */var/log/vscp/vscpd.log* on Linux and *\program files (x86)\vscp\vscp.log* on Windows. The exception is at vscpd start up, before the configuration file is read and the configured location for the log file is unknown, here logging is done to the console and on Linux also to the syslog.
+This is the log console and file settings. Default is to log to the logfile */var/log/vscp/mqttvscpd:.log* on Linux and *\program files (x86)\vscp\vscp.log* on Windows. The exception is at mqttvscpd: start up, before the configuration file is read and the configured location for the log file is unknown, here logging is done to the console and on Linux also to the syslog.
 
 Modes for logging can be set as of below. In debug/trace mode the debug flag above defines how much info is logged.
 
@@ -304,7 +304,7 @@ Log file pattern as described [here](https://github.com/gabime/spdlog/wiki/3.-Cu
 
 ##### file-path :id=config-general-logging-file-path
 
-Path to log file. Default is on Linux is */var/log/vscp/vscpd.log*
+Path to log file. Default is on Linux is */var/log/vscp/mqttvscpd:.log*
 
 ##### file-max-size :id=config-general-logging-file-max-size
 Max size for log file. It will be rotated if over this size. Default is 10 Mb.
@@ -354,7 +354,7 @@ Log level for console log. Default is "info".
 | "off" | No logging |
 
 ##### syslog-ident :id=config-general-logging-syslog-ident
-This set to "mqttvscpd" as default and is the program identifier tag that gets attached to every log line syslog receives from your application — it's how syslog (and anything reading its output) knows which program sent a given message.
+This set to "mqttmqttvscpd:" as default and is the program identifier tag that gets attached to every log line syslog receives from your application — it's how syslog (and anything reading its output) knows which program sent a given message.
 
 #### Logging to UDP
 
@@ -1025,7 +1025,7 @@ Level II drivers can handle the full VSCP abstraction and don't have the small l
     "enable" : false,
     "name" : "Logger",
     "path-driver" : "/var/lib/vscp/drivers/level2/vscpl2drv-logger.so",
-    "path-config" : "/var/lib/vscp/vscpd/logger2.conf",
+    "path-config" : "/var/lib/vscp/mqttvscpd:/logger2.conf",
     "guid" : "FF:FF:FF:FF:FF:FF:FF:F5:02:00:00:00:00:00:00:01",
 
     "mqtt" : {

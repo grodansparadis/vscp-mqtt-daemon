@@ -82,7 +82,7 @@ set(MQTTVSCPD_SOURCES
     src/controlobject.cpp
     src/devicelist.cpp
     src/devicethread.cpp
-    src/vscpd.cpp)
+    src/mqttvscpd.cpp)
 
 if(WIN32)
     list(APPEND MQTTVSCPD_SOURCES src/pch.cpp)
