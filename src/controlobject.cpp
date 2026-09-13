@@ -469,10 +469,11 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     );
     syslog_sink->set_level(m_sysLogLevel);
     logger->sinks().push_back(syslog_sink);
+    spdlog::info("Syslog logging initialized with ident '{}'", m_sysLogIdent);
   }
 #endif
 
-  // UDP sink — only info+ to avoid flooding the network, terse pattern
+  // UDP sink — use only info to avoid flooding the network, terse pattern
   if (m_bEnableUdpLog) {
     try {
       spdlog::sinks::udp_sink_config udp_cfg(m_udpLogHost.c_str(), m_udpLogPort);
@@ -480,9 +481,9 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
       udp_sink->set_level(m_udpLogLevel);
       udp_sink->set_pattern(m_udpLogPattern.c_str());
       logger->sinks().push_back(udp_sink);
+      spdlog::info("UDP logging initialized to {}:{}", m_udpLogHost, m_udpLogPort);
     }
     catch (const spdlog::spdlog_ex &ex) {
-      // std::printf("UDP logging init failed: %s\n", ex.what());
       spdlog::error("UDP logging init failed: {}", ex.what());
     }
   }

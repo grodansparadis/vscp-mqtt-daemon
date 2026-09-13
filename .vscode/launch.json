@@ -14,6 +14,32 @@
           "-c/home/akhe/development/VSCP/vscp-mqtt-daemon/debug/linux/mqttvscpd.json"
         ],
         "environment": [
+
+        ],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ],
+        "preLaunchTask": "build mqttvscpd",
+        "miDebuggerPath": "/usr/bin/gdb"
+      },
+      {
+        "name": "(gdb) mqttvscpd w/ UDP debug",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "/home/akhe/development/VSCP/vscp-mqtt-daemon/build/mqttvscpd",
+        "args": [
+          "-s",
+          "-c/home/akhe/development/VSCP/vscp-mqtt-daemon/debug/linux/mqttvscpd.json"
+        ],
+        "environment": [
           {
             "name": "VSCP_ENABLE_UDP_DEBUG",
             "value": "1"
