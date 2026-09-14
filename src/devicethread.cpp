@@ -100,7 +100,7 @@ receive_event_callback(vscpEvent &ev, void *pobj)
   pthread_mutex_lock(&pDeviceItem->m_deviceMutex);
 
   if (pDeviceItem->m_bQuit || (0 == pDeviceItem->m_openHandle)) {
-    spdlog::warning("receive_event_callback: Device is not open or quitting, returning from receive_event_callback.");
+    spdlog::warn("receive_event_callback: Device is not open or quitting, returning from receive_event_callback.");
     pthread_mutex_unlock(&pDeviceItem->m_deviceMutex);
     return;
   }
@@ -415,11 +415,11 @@ deviceThread(void *pData)
 
     // Set interface/driver GUID
     pDeviceItem->m_mqttClient.setIfGuid(pDeviceItem->m_guid);
-    spdlog::trace("Devicethread: Setting interface GUID for MQTT client. GUID={}", pDeviceItem->m_guid);
+    spdlog::trace("Devicethread: Setting interface GUID for MQTT client. GUID={}", pDeviceItem->m_guid.getAsString());
 
     // Set server GUID
     pDeviceItem->m_mqttClient.setSrvGuid(pDeviceItem->m_pCtrlObj->m_guid);
-    spdlog::trace("Devicethread: Setting server GUID for MQTT client. GUID={}", pDeviceItem->m_pCtrlObj->m_guid);
+    spdlog::trace("Devicethread: Setting server GUID for MQTT client. GUID={}", pDeviceItem->m_pCtrlObj->m_guid.getAsString());
 
     // Add user escapes
     pDeviceItem->m_mqttClient.setUserEscape("driver-name", pDeviceItem->m_strName);
@@ -638,7 +638,7 @@ deviceThread(void *pData)
         } // data available
 
         if (!bActivity) {
-          spdlog::trace("Devicethread: No activity, sleeping for 100 ms.");cd
+          spdlog::trace("Devicethread: No activity, sleeping for 100 ms.");
           usleep(100000); // 100 ms
         }
 
