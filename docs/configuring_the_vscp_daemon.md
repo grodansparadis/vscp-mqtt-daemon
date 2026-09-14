@@ -983,7 +983,9 @@ The semicolon separated configuration string for the driver. The meaning of this
 
 ### flags :id=config-level1-driver-flags
 
-A 32 bit driver specific number that have bits set that have special meaning for a driver. See the documentation for a specific driver for an explanation of the meaning of each flag bit for that driver.
+Can be set as a devimal number or a hexadecimal, octal or binary string prefixed with "0x", "0o", "ob".
+
+This is a 32 bit driver specific number that have bits set that have special meaning for a driver. See the documentation for a specific driver for an explanation of the meaning of each flag bit for that driver. Given as a number 
 
 ### path :id=config-level1-driver-path
 

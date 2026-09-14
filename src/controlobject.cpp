@@ -2343,18 +2343,29 @@ CControlObject::readJSON(const json &j)
     // Level I drivers
     if (!(j["drivers"].contains("level1") && j["drivers"]["level1"].is_object())) {
 
+      spdlog::debug("ReadConfig: Level I driver config.");
+
       json sub = j["drivers"]["level1"];
       for (json::iterator it = sub.begin(); it != sub.end(); ++it) {
 
         if ((*it).value("enable", false) && (*it)["name"].is_string() && (*it)["config"].is_string() &&
-            (*it)["path"].is_string() && (*it)["flags"].is_number() && (*it)["guid"].is_string() &&
+            (*it)["path"].is_string()  && (*it)["guid"].is_string() &&
             (*it)["translation"].is_number()) {
+
+          uint32_t flags = 0;
+          if ((*it)["flags"].is_number()) {
+            flags = (*it)["flags"].get<uint32_t>();
+          }
+          else if ((*it)["flags"].is_string()) {
+            flags = vscp_readStringValue((*it)["flags"]);
+          }
+      
 
           spdlog::debug("ReadConfig: Adding Level I driver with name = {} and config = {} and path = {} and flags = {} and guid = {} and translation = {}",
                         (*it)["name"].get<std::string>(),
                         (*it)["config"].get<std::string>(),
                         (*it)["path"].get<std::string>(),
-                        (*it)["flags"].get<uint32_t>(),
+                        flags, // Configuration flags
                         (*it)["guid"].get<std::string>(),
                         (*it)["translation"].get<uint8_t>());
 
@@ -2363,7 +2374,7 @@ CControlObject::readJSON(const json &j)
                                     (*it)["name"].get<std::string>(),
                                     (*it)["config"].get<std::string>(),
                                     (*it)["path"].get<std::string>(),
-                                    (*it)["flags"].get<uint32_t>(),
+                                    flags, // Configuration flags
                                     (*it)["guid"].get<std::string>(),
                                     VSCP_DRIVER_LEVEL1,
                                     (*it)["translation"].get<uint8_t>())) {
@@ -2416,6 +2427,7 @@ CControlObject::readJSON(const json &j)
 
     // Level II drivers
     if (!(j["drivers"].contains("level2") && j["drivers"]["level2"].is_object())) {
+      spdlog::debug("ReadConfig: Level II driver config.");
       json sub = j["drivers"]["level2"];
       for (json::iterator it = sub.begin(); it != sub.end(); ++it) {
         // std::cout << (*it)["name"] << '\n';
