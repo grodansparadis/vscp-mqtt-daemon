@@ -476,7 +476,6 @@ deviceThread(void *pData)
         vscpEvent ev;
 
         // Get an CANAL event - blocking
-        spdlog::trace("Devicethread: Waiting for CANAL message (blocking).");
         if (CANAL_ERROR_SUCCESS == pDeviceItem->m_proc_CanalBlockingReceive(pDeviceItem->m_openHandle, &msg, 50)) {
 
           // Publish to MQTT broker
