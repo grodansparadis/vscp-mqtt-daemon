@@ -1866,10 +1866,10 @@ CControlObject::readJSON(const json &j)
         m_bEnableFileLog = j["logging"]["file-enable-log"].get<bool>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'file-enable-log' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'file-enable-log' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'file-enable-log' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'file-enable-log' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'file-enable-log' set to {}", m_bEnableFileLog ? "true" : "false");
     }
@@ -1884,10 +1884,10 @@ CControlObject::readJSON(const json &j)
         str = j["logging"]["file-log-level"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'file-log-level' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'file-log-level' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'file-log-level' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'file-log-level' due to unknown error.");
       }
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
@@ -1932,10 +1932,10 @@ CControlObject::readJSON(const json &j)
         m_fileLogPattern = j["logging"]["file-pattern"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'file-pattern' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'file-pattern' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'file-pattern' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'file-pattern' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'file-pattern' set to {}.", m_fileLogPattern);
     }
@@ -1949,10 +1949,10 @@ CControlObject::readJSON(const json &j)
         m_path_to_log_file = j["logging"]["file-path"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'file-path' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'file-path' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'file-path' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'file-path' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'file-path' set to '{}'.", m_path_to_log_file);
     }
@@ -1966,10 +1966,10 @@ CControlObject::readJSON(const json &j)
         m_max_log_size = j["logging"]["file-max-size"].get<uint32_t>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'file-max-size' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'file-max-size' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'file-max-size' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'file-max-size' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'file-max-size' set to '{}'.", m_max_log_size);
     }
@@ -1983,10 +1983,10 @@ CControlObject::readJSON(const json &j)
         m_max_log_files = j["logging"]["file-max-files"].get<uint16_t>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'file-max-files' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'file-max-files' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'file-max-files' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'file-max-files' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'file-max-files' set to '{}'.", m_max_log_files);
     }
@@ -2002,10 +2002,10 @@ CControlObject::readJSON(const json &j)
         m_bEnableConsoleLog = j["logging"]["console-enable-log"].get<bool>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'console-enable-log' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'console-enable-log' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'console-enable-log' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'console-enable-log' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'console-enable-log' set to {}", m_bEnableConsoleLog ? "true" : "false");
     }
@@ -2020,10 +2020,10 @@ CControlObject::readJSON(const json &j)
         str = j["logging"]["console-log-level"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'console-enable-level' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'console-enable-level' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'console-enable-level' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'console-enable-level' due to unknown error.");
       }
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
@@ -2068,10 +2068,10 @@ CControlObject::readJSON(const json &j)
         m_consoleLogPattern = j["logging"]["console-pattern"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'console-pattern' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'console-pattern' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'console-pattern' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'console-pattern' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'console-pattern' set to {}.", m_consoleLogPattern);
     }
@@ -2087,10 +2087,10 @@ CControlObject::readJSON(const json &j)
         m_bEnableSysLog = j["logging"]["syslog-enable-log"].get<bool>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'syslog-enable-log' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'syslog-enable-log' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'syslog-enable-log' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'syslog-enable-log' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'syslog-enable-log' set to {}", m_bEnableSysLog ? "true" : "false");
     }
@@ -2105,10 +2105,10 @@ CControlObject::readJSON(const json &j)
         str = j["logging"]["syslog-log-level"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'syslog-log-level' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'syslog-log-level' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'syslog-log-level' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'syslog-log-level' due to unknown error.");
       }
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
@@ -2153,10 +2153,10 @@ CControlObject::readJSON(const json &j)
         m_sysLogIdent = j["logging"]["syslog-ident"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'syslog-ident' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'syslog-ident' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'syslog-ident' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'syslog-ident' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'syslog-ident' set to {}.", m_sysLogIdent);
     }
@@ -2170,10 +2170,10 @@ CControlObject::readJSON(const json &j)
         m_bEnableUdpLog = j["logging"]["udp-enable-log"].get<bool>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'udp-enable-log' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'udp-enable-log' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'udp-enable-log' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'udp-enable-log' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'udp-enable-log' set to {}", m_bEnableUdpLog ? "true" : "false");
     }
@@ -2188,10 +2188,10 @@ CControlObject::readJSON(const json &j)
         str = j["logging"]["udp-log-level"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'udp-log-level' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'udp-log-level' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'udp-log-level' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'udp-log-level' due to unknown error.");
       }
       vscp_makeLower(str);
       if (std::string::npos != str.find("off")) {
@@ -2233,15 +2233,15 @@ CControlObject::readJSON(const json &j)
         m_udpLogPattern = j["logging"]["udp-pattern"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'udp-pattern' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'udp-pattern' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'udp-pattern' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'udp-pattern' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'udp-pattern' set to {}.", m_udpLogPattern);
     }
     else {
-      spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-pattern' Defaults will be used.");
+      spdlog::debug("ReadConfig: Failed to read LOGGING 'udp-pattern'. Defaults will be used.");
     }
 
     // Logging: udp-host
@@ -2250,10 +2250,10 @@ CControlObject::readJSON(const json &j)
         m_udpLogHost = j["logging"]["udp-host"].get<std::string>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'udp-host' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'udp-host' Error='{}'", ex.what());
       }
       catch (...) {
-        spdlog::error("Failed to read 'udp-host' due to unknown error.");
+        spdlog::error("ReadConfig: Failed to read 'udp-host' due to unknown error.");
       }
       spdlog::debug("ReadConfig: LOGGING 'udp-host' set to {}.", m_udpLogHost);
     }
@@ -2267,7 +2267,7 @@ CControlObject::readJSON(const json &j)
         m_udpLogPort = j["logging"]["udp-port"].get<uint16_t>();
       }
       catch (const std::exception &ex) {
-        spdlog::error("Failed to read 'udp-port' Error='{}'", ex.what());
+        spdlog::error("ReadConfig: Failed to read 'udp-port' Error='{}'", ex.what());
       }
       catch (...) {
         spdlog::error("Failed to read 'udp-port' due to unknown error.");
@@ -2350,6 +2350,14 @@ CControlObject::readJSON(const json &j)
             (*it)["path"].is_string() && (*it)["flags"].is_number() && (*it)["guid"].is_string() &&
             (*it)["translation"].is_number()) {
 
+          spdlog::debug("ReadConfig: Adding Level I driver with name = {} and config = {} and path = {} and flags = {} and guid = {} and translation = {}",
+                        (*it)["name"].get<std::string>(),
+                        (*it)["config"].get<std::string>(),
+                        (*it)["path"].get<std::string>(),
+                        (*it)["flags"].get<uint32_t>(),
+                        (*it)["guid"].get<std::string>(),
+                        (*it)["translation"].get<uint8_t>());
+
           // Add the level I device
           if (!m_deviceList.addItem(this,
                                     (*it)["name"].get<std::string>(),
@@ -2359,7 +2367,7 @@ CControlObject::readJSON(const json &j)
                                     (*it)["guid"].get<std::string>(),
                                     VSCP_DRIVER_LEVEL1,
                                     (*it)["translation"].get<uint8_t>())) {
-            spdlog::debug("Level I driver not added name={}. "
+            spdlog::debug("ReadConfig: Level I driver not added name={}. "
                           "Path does not exist. - [{}]",
                           (*it)["name"].get<std::string>(),
                           (*it)["path"].get<std::string>());
@@ -2379,6 +2387,7 @@ CControlObject::readJSON(const json &j)
             }
             else {
 
+              // Get driver data
               CDeviceItem *pDriver = m_deviceList.getDeviceItemFromName((*it)["name"]);
               if (nullptr == pDriver) {
                 spdlog::debug("ReadConfig: Driver MQTT info can not be added. Driver not found.");
@@ -2386,6 +2395,8 @@ CControlObject::readJSON(const json &j)
               else {
 
                 pDriver->m_mqttConfig = (*it)["mqtt"];
+
+                spdlog::debug("ReadConfig: mqtt object for driver {}. No drivers will be used. Path = {}", (*it)["name"].get<std::string>(), (*it)["path"].get<std::string>());
 
                 // Do MQTT configuration
                 if (!pDriver->m_mqttClient.initFromJson(pDriver->m_mqttConfig.dump())) {
@@ -2410,7 +2421,10 @@ CControlObject::readJSON(const json &j)
         // std::cout << (*it)["name"] << '\n';
         if ((*it).value("enable", false) && (*it)["name"].is_string() && (*it)["path-config"].is_string() &&
             (*it)["path-driver"].is_string() && (*it)["guid"].is_string()) {
-          // Add the level I device
+          // Add the level II device
+          spdlog::trace("ReadConfig: Adding Level II driver with name = {} and path = {}",
+                        (*it)["name"].get<std::string>(),
+                        (*it)["path-driver"].get<std::string>());
           if (!m_deviceList.addItem(this,
                                     (*it)["name"].get<std::string>(),
                                     (*it)["path-config"].get<std::string>(),
@@ -2418,7 +2432,7 @@ CControlObject::readJSON(const json &j)
                                     0,
                                     (*it)["guid"].get<std::string>(),
                                     VSCP_DRIVER_LEVEL2)) {
-            spdlog::debug("Level II driver not added name={}. "
+            spdlog::debug("ReadConfig: Level II driver not added name={}. "
                           "Path does not exist. - [{}]",
                           (*it)["name"].get<std::string>(),
                           (*it)["path-driver"].get<std::string>());
@@ -2436,7 +2450,7 @@ CControlObject::readJSON(const json &j)
               spdlog::debug("ReadConfig: mqtt object. Defaults will be used.");
             }
             else {
-
+              // Get driver data
               CDeviceItem *pDriver = m_deviceList.getDeviceItemFromName((*it)["name"]);
               if (nullptr == pDriver) {
                 spdlog::debug("ReadConfig: Driver MQTT info can not be added. Driver not found.");
