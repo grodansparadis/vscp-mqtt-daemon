@@ -532,12 +532,7 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
     }
   }
 
-  str = "VSCP MQTT Daemon started - ";
-  str += "Version: ";
-  str += MQTTVSCPD_DISPLAY_VERSION;
-  str += " - ";
-  str += MQTTVSCPD_COPYRIGHT;
-  spdlog::info(str.c_str());
+  
 
   // Load class/type definitions from database if they should be loaded
 
@@ -592,9 +587,9 @@ CControlObject::init(std::string &strcfgfile, std::string &rootFolder)
           uint16_t link_to_class                                 = (uint16_t) sqlite3_column_int(ppStmt, 1);
           std::string token                                      = (const char *) sqlite3_column_text(ppStmt, 2);
           m_map_type_id2Token[(link_to_class << 16) + vscp_type] = token;
-          spdlog::debug("Token = {} ", m_map_type_id2Token[(link_to_class << 16) + vscp_type]);
+          spdlog::trace("[Types] Token = {} ", m_map_type_id2Token[(link_to_class << 16) + vscp_type]);
           m_map_type_token2Id[token] = (link_to_class << 16) + vscp_type;
-          spdlog::debug("Id = {}", m_map_type_token2Id[token]);
+          spdlog::trace("[Types] Id = {}", m_map_type_token2Id[token]);
         }
         sqlite3_finalize(ppStmt);
       }
@@ -1001,7 +996,14 @@ CControlObject::run(void)
   sd_notify(0, "READY=1");
 #endif
 
-  spdlog::debug("Controlobject: run");
+  std::string str;
+  str = "VSCP MQTT Daemon started - ";
+  str += "Version: ";
+  str += MQTTVSCPD_DISPLAY_VERSION;
+  str += " - ";
+  str += MQTTVSCPD_COPYRIGHT;
+  spdlog::info(str.c_str());
+  spdlog::debug("run");
 
   // init MQTT
   try {
@@ -1015,6 +1017,8 @@ CControlObject::run(void)
     return false;
   }
 
+  spdlog::debug("init MQTT completed");
+
   // Load drivers
   try {
     if (!startDeviceWorkerThreads()) {
@@ -1026,6 +1030,8 @@ CControlObject::run(void)
     spdlog::critical("controlobject: Exception when loading drivers.");
     return false;
   }
+
+  spdlog::debug("startDeviceWorkerThreads completed");
 
   //-------------------------------------------------------------------------
   //                            MAIN - LOOP
