@@ -20,10 +20,10 @@ jobs:
         include:
           - name: arm64
             platform: linux/arm64
-            image: arm64v8/ubuntu:24.04
+            image: arm64v8/bookworm
           - name: armhf
             platform: linux/arm/v7
-            image: arm32v7/ubuntu:24.04
+            image: arm32v7/bookworm
 
     steps:
       - name: Checkout
