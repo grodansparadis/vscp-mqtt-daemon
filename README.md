@@ -14,6 +14,10 @@ The **vscp-tcpip-daemon** export the VSCP tcp/ip link protocol and can just as t
 
 This repository is for the __vscp-mqtt-daemon__.  The vscp-mqtt-daemon is available for Linux, Windows and Macintosh. Binaries is available for all platforms including Raspberrey Pi.
 
+## Install
+
+Binary installs for Linux, macOS, Windows and Raspberry Pi is available under [releases](https://github.com/grodansparadis/vscp-mqtt-daemon/releases) in the repository. For older releases check the [vscp main repository](https://github.com/grodansparadis/vscp).
+
 ## Build
 
 Fetch the source code with
