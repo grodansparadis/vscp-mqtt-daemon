@@ -64,7 +64,6 @@
 
 #endif
 
-#include "vscp-udp-log.h"
 #include "canal-macro.h"
 #include "mqttvscpd.h"
 #include "controlobject.h"
@@ -261,12 +260,6 @@ main(int argc, char **argv)
   std::string strcfgfile; // Points to XML configuration file
   pid_t sid = 0;
 
-  char *value = getenv("VSCP_ENABLE_UDP_DEBUG");
-  if (value != NULL) {
-    printf("VSCP_ENABLE_UDP_DEBUG = %s\n", value);
-  }
-
-  VSCP_UDP_LOG("mqttvscpd starting up...");
 
   // Init pool
   spdlog::init_thread_pool(8192, 1);
@@ -310,7 +303,6 @@ main(int argc, char **argv)
 
       case 'd': {
         console->info("Debug flags=%s\n", optarg);
-        VSCP_UDP_LOG("Debugflags=%s", optarg);
         break;
       }
 
@@ -344,7 +336,6 @@ main(int argc, char **argv)
   console->info("Starting the VSCP MQTT daemon...");
   console->info("Configfile = {}", strcfgfile);
 
-  VSCP_UDP_LOG("Main paths: root=%s cfg=%s", rootFolder.c_str(), strcfgfile.c_str());
 
 #ifndef WIN32
   if (!daemonize(&sid)) {
@@ -471,8 +462,6 @@ main(int argc, char **argv)
 
   spdlog::drop_all();
   spdlog::shutdown();
-
-  VSCP_UDP_LOG("mqttvscpd quiting");
 
   exit(EXIT_SUCCESS);
 }
