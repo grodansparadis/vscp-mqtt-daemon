@@ -6,9 +6,9 @@
   * [Setting up the system](setting_up_the_system.md)
 
 * Configure
- * [The configuration file](configuring_the_vscp_daemon.md)
- * [Startup switches](startup_switches.md)
- * [Files and directory structure](files_and_directory_structure.md)
+  * [The configuration file](configuring_the_vscp_daemon.md)
+  * [Startup switches](startup_switches.md)
+  * [Files and directory structure](files_and_directory_structure.md)
 
 * Subscribing
   * [Server subscriptions](subscribing_server.md)
@@ -24,18 +24,18 @@
   * [VSCP UDP log helper](vscp_udp_log.md)
 
 * Server/Service Discovery
- * [General](server_disovery.md)
- * [High end server probe](server_disovery_probe.md)
- * [Heartbeats](server_disovery_heartbeats.md)	
+  * [General](server_disovery.md)
+  * [High end server probe](server_disovery_probe.md)
+  * [Heartbeats](server_disovery_heartbeats.md)	
 
 * Drivers
- *  [Driver Interfaces](driver_interfaces.md)
+  *  [Driver Interfaces](driver_interfaces.md)
   * [Level I Drivers](level_i_drivers.md)
   * [Level II Drivers](level_ii_drivers.md)
 
 * Appendix
- * [Setting up a Mosquitto MQTT broker](./mosquitto_set_up_broker.md)
- * [Setting up websockets on a Mosquitto MQTT broker](./mosquitto_set_up_websockets.md)
+  * [Setting up a Mosquitto MQTT broker](./mosquitto_set_up_broker.md)
+  * [Setting up websockets on a Mosquitto MQTT broker](./mosquitto_set_up_websockets.md)
 
 * Other documentation
- *  [Documentation Site](https://docs.vscp.org)
+  *  [Documentation Site](https://docs.vscp.org)
