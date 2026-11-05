@@ -23,8 +23,10 @@ Binary installs for Linux, macOS, Windows and Raspberry Pi is available under [r
 Fetch the source code with
 
 ```bash
-git clone --recursive https://github.com/grodansparadis/vscp-mqtt-daemon.git
-``` 
+git clone https://github.com/grodansparadis/vscp-mqtt-daemon.git
+```
+
+The VSCP common sources and their third-party dependencies (nlohmann/json, Mustache, spdlog, maddy) are downloaded automatically by CMake (FetchContent) at configure time, so no submodules are needed. SQLite3 development files must be installed on the system (e.g. `libsqlite3-dev` on Debian/Ubuntu; included in the macOS SDK; `sqlite3` via vcpkg on Windows).
 
 ### Linux
 

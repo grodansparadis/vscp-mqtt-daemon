@@ -4,14 +4,12 @@
             "name": "C/C++",
             "includePath": [
                 "${workspaceFolder}/src",
-                "${workspaceFolder}/third-party/json/include",
-                "${workspaceFolder}/third-party/vscp/src/common",
-                "${workspaceFolder}/third-party/vscp/src/vscp/common",
-                "${workspaceFolder}/third-party/vscp/third-party/sqlite3",
-                "${workspaceFolder}/third-party/vscp/third_party/maddy/include",
-                "${workspaceFolder}/third-party/spdlog/include",
-                "${workspaceFolder}/third-party/Mustache",
-                "${workspaceFolder}/third-party/vscp/third_party/nlohmann/include"
+                "${workspaceFolder}/build/_deps/vscp-src/src/common",
+                "${workspaceFolder}/build/_deps/vscp-src/src/vscp/common",
+                "${workspaceFolder}/build/_deps/vscp_maddy-src/include",
+                "${workspaceFolder}/build/_deps/vscp_spdlog-src/include",
+                "${workspaceFolder}/build/_deps/vscp_mustache-src",
+                "${workspaceFolder}/build/_deps/vscp_nlohmann_json-src/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

@@ -29,7 +29,7 @@
   * [Heartbeats](server_disovery_heartbeats.md)	
 
 * Drivers
-  *  [Driver Interfaces](driver_interfaces.md)
+  * [Driver Interfaces](driver_interfaces.md)
   * [Level I Drivers](level_i_drivers.md)
   * [Level II Drivers](level_ii_drivers.md)
 

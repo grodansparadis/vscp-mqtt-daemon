@@ -37,26 +37,32 @@ endif()
 
 set(VSCP_BUILD_TESTS OFF CACHE BOOL "Build VSCP library tests" FORCE)
 set(VSCP_INSTALL OFF CACHE BOOL "Install VSCP helper libraries" FORCE)
-add_subdirectory(third-party/vscp)
 
-if(NOT TARGET vscp_sqlite3)
-    add_library(vscp_sqlite3 STATIC
-        third-party/vscp/third-party/sqlite3/sqlite3.c)
-    target_include_directories(vscp_sqlite3
-        PUBLIC
-            third-party/vscp/third-party/sqlite3)
+find_package(SQLite3 REQUIRED)
+
+include(FetchContent)
+
+set(VSCP_FETCH_CONTENT_OPTIONS)
+if(NOT CMAKE_VERSION VERSION_LESS "3.24")
+    list(APPEND VSCP_FETCH_CONTENT_OPTIONS DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 endif()
 
-target_include_directories(vscp_mdf
-    PUBLIC
-        third-party/json/include
-        third-party/Mustache
-        third-party/spdlog/include
-        third-party/vscp/third_party/maddy/include)
+# The VSCP common libraries are fetched as a pinned source tarball. The VSCP
+# build fetches its own third-party dependencies (nlohmann/json, Mustache,
+# spdlog, maddy) and exposes their include directories on its library targets.
+# A tarball avoids cloning ~1.2GB of git history that this project never uses.
+# Get URL_HASH with:
+#   curl -sL https://codeload.github.com/grodansparadis/vscp/tar.gz/<commit> | sha256sum
+FetchContent_Declare(
+    vscp
+    URL https://codeload.github.com/grodansparadis/vscp/tar.gz/898fcc1ce6a89b5f4b2b8a3a233cad663dcd278f
+    URL_HASH SHA256=5485966dab085bab3ce4fb815de0a4bc8056cf11afc35b1531cc9cb8bcec6b16
+    ${VSCP_FETCH_CONTENT_OPTIONS}
+)
+FetchContent_MakeAvailable(vscp)
 
 if(WIN32)
     set(MQTTVSCPD_WINDOWS_PCH_CONSUMER_TARGETS
-        vscp_sockettcp
         vscp_guid
         vscp_mdf
         vscp_core
@@ -93,14 +99,12 @@ add_executable(mqttvscpd ${MQTTVSCPD_SOURCES})
 target_include_directories(mqttvscpd
     PRIVATE
         src
-        third-party/json/include
-        third-party/vscp/src/vscp/common
-        third-party/vscp/third-party/sqlite3)
+        ${vscp_SOURCE_DIR}/src/vscp/common)
 
 target_link_libraries(mqttvscpd
     PRIVATE
         vscp_common
-        vscp_sqlite3)
+        SQLite::SQLite3)
 
 if(WIN32)
     find_package(Threads REQUIRED)
@@ -192,7 +196,6 @@ set(MQTTVSCPD_VSCP_RUNTIME_TARGETS
     vscp_client_ws2
     vscp_client_multicast
     vscp_client_mqtt
-    vscp_sockettcp
     vscp_util)
 
 if(TARGET vscp_client_socketcan)
