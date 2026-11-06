@@ -4,7 +4,8 @@ set -euo pipefail
 
 version_file=${1:-src/version.h}
 year=$(date -u +%y)
-month=$(date -u +%m)
+# Strip leading zero so the month is never an invalid C octal literal (e.g. 08)
+month=$((10#$(date -u +%m)))
 # First-parent commit count keeps the patch identical for CI artifacts and local cpack
 patch=$(git rev-list --count --first-parent HEAD)
 version="${year}.${month}.${patch}"
