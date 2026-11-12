@@ -4,7 +4,7 @@
 [![CI Codacy](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-codacy.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-codacy.yml) [![CI Linux](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-linux.yml) [![CI macOS](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-macos.yml)  [![CI Windows](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-windows.yml)  [![CI Raspberry Pi](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-raspberry-pi.yml/badge.svg)](https://github.com/grodansparadis/vscp-mqtt-daemon/actions/workflows/ci-raspberry-pi.yml)
 
 
-![](./docs/images/vscp-mqtt-daemon.jpg)
+![](./docs/images/vscp-mqtt-daemon.jpeg)
 
 There are currently two daemons (servers) for the VSCP protocol. The VSCP MQTT daemon (**vscp-mqtt-daemon**) and the [VSCP tcp/ip daemon (vscp-tcpip-daemon)](https://github.com/grodansparadis/vscp-tcpip-daemon). They manily differ in the way they expose VSCP events.
 
