@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- Add scripts/download-artifacts.sh to download and verify the newest CI build artifacts
 - Fixed info image (e434539)
 - Changed repository image (982270f)
 - Initial plan (b4ad57f)
