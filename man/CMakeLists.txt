@@ -31,9 +31,9 @@ if (${PANDOCCOMMAND_FOUND})
   )
 
   add_custom_target(man ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8)
-endif()
 
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8
-  DESTINATION ${CMAKE_INSTALL_MANDIR}/man8
-)
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/mqttvscpd.8
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man8
+  )
+endif()

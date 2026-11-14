@@ -7,6 +7,7 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- Man pages: only mqttvscpd(8) is built (with pandoc) and installed. Removed the generated pages, old scripts and the copied pages for commands and files the daemon does not have
 - Add scripts/download-artifacts.sh to download and verify the newest CI build artifacts
 - Fixed info image (e434539)
 - Changed repository image (982270f)
