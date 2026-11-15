@@ -55,8 +55,8 @@ endif()
 #   curl -sL https://codeload.github.com/grodansparadis/vscp/tar.gz/<commit> | sha256sum
 FetchContent_Declare(
     vscp
-    URL https://codeload.github.com/grodansparadis/vscp/tar.gz/898fcc1ce6a89b5f4b2b8a3a233cad663dcd278f
-    URL_HASH SHA256=5485966dab085bab3ce4fb815de0a4bc8056cf11afc35b1531cc9cb8bcec6b16
+    URL https://codeload.github.com/grodansparadis/vscp/tar.gz/d75d4f5c6c097a1dca841b63727c79c522b701ce
+    URL_HASH SHA256=709763c16c995b65787e72947f9c3f45a03a404c708286c7cad00b53dcaedbb5
     ${VSCP_FETCH_CONTENT_OPTIONS}
 )
 FetchContent_MakeAvailable(vscp)
