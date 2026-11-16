@@ -1,1 +1,0 @@
-/home/akhe/development/VSCP/vscp-mqtt-daemon/src/vscpd.cpp

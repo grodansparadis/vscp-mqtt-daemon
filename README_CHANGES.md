@@ -5,7 +5,7 @@ Add each change under **Unreleased** when it is made. When a release is
 tagged, rename **Unreleased** to the version and date, and start a new
 **Unreleased** section above it.
 
-## Unreleased
+##  v26.11.103
 
 - Build against the latest vscp master (d75d4f5c6)
 - Man pages: only mqttvscpd(8) is built (with pandoc) and installed. Removed the generated pages, old scripts and the copied pages for commands and files the daemon does not have
